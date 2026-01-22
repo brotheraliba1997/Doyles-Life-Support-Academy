@@ -114,7 +114,9 @@ async function bootstrap() {
   // Serializer
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
-  // Swagger Documentation Setup
+  await app.init();
+
+  // Swagger Documentation Setup (after app.init() for serverless compatibility)
   const options = new DocumentBuilder()
     .setTitle('API')
     .setDescription('API docs')
@@ -132,12 +134,16 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('docs', app, document, {
+    customSiteTitle: 'API Documentation',
     swaggerOptions: {
       persistAuthorization: true,
+      docExpansion: 'none',
+      filter: true,
+      showRequestDuration: true,
+      tryItOutEnabled: true,
     },
+    customCss: '.swagger-ui .topbar { display: none }',
   });
-
-  await app.init();
   isBootstrapped = true;
 }
 
