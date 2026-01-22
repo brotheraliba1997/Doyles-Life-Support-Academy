@@ -8,6 +8,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { Reflector } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import express, { Request, Response } from 'express';
 import * as path from 'path';
 
@@ -107,6 +108,25 @@ async function bootstrap() {
 
   // Serializer
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
+
+  // Swagger Documentation Setup
+  const options = new DocumentBuilder()
+    .setTitle('API')
+    .setDescription('API docs')
+    .setVersion('1.0')
+    .addBearerAuth()
+    .addGlobalParameters({
+      in: 'header',
+      required: false,
+      name: process.env.APP_HEADER_LANGUAGE || 'x-custom-lang',
+      schema: {
+        example: 'en',
+      },
+    })
+    .build();
+
+  const document = SwaggerModule.createDocument(app, options);
+  SwaggerModule.setup('docs', app, document);
 
   await app.init();
   isBootstrapped = true;
