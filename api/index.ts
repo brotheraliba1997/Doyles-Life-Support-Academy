@@ -95,7 +95,7 @@ async function bootstrap() {
 
   // Global Prefix
   app.setGlobalPrefix(configService.get('app.apiPrefix', 'api'), {
-    exclude: ['/', 'docs', 'docs-json'],
+    exclude: ['/', '/docs', '/docs-json', 'docs', 'docs-json'],
   });
 
   // API Versioning
@@ -116,7 +116,7 @@ async function bootstrap() {
 
   await app.init();
 
-  // Swagger Documentation Setup (after app.init() for serverless compatibility)
+  // Swagger Documentation Setup (after app.init() to scan all routes)
   const options = new DocumentBuilder()
     .setTitle('API')
     .setDescription('API docs')
