@@ -26,7 +26,6 @@ import {
   sanitizeMongooseDocument,
 } from '../utils/convert-id';
 import { CategoriesService } from '../category/categories.service';
-import { AssessmentItem } from '../assessment-Items/schema/assessmentItem.schema';
 import { CreateCrouseAssessmentItemDto } from './dto/create-assessment-Item.dto';
 import {
   Notification,
@@ -53,8 +52,7 @@ export class CoursesService {
     private readonly configService: ConfigService<AllConfigType>,
     private readonly categoriesService: CategoriesService,
 
-    @InjectModel(AssessmentItem.name)
-    private readonly assessmentItemModel: Model<AssessmentItem>,
+  
 
     @InjectModel(Notification.name)
     private readonly notificationModel: Model<NotificationDocument>,
@@ -250,7 +248,7 @@ export class CoursesService {
           courseId: created._id.toString(), 
         }));
     
-        await this.assessmentItemModel.insertMany(items);
+        
       } catch (error) {
         console.error('Assessment items creation failed:', error);
       }

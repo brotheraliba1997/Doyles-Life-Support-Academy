@@ -38,14 +38,7 @@ export class StudentItemGradeController {
     return this.gradeService.findByStudent(studentId);
   }
 
-  @Get('course/:courseId/result-pass-fail/:studentId')
-  @ApiOperation({ summary: 'Get all grades of a student' })
-  resultPassFail(
-    @Param('courseId') courseId: string,
-    @Param('studentId') studentId: string,
-  ) {
-    return this.gradeService.resultPassFail(courseId, studentId);
-  }
+
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update obtained marks' })

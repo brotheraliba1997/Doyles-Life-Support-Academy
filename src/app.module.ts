@@ -44,7 +44,6 @@ import { LocationModule } from './location/location.module';
 import { NotificationModule } from './notification/notification.module';
 import { EnquiriesModule } from './enquiry/enquiries.module';
 import { AssigmentModule } from './assigment/assigment.module';
-import { AssessmentItemModule } from './assessment-Items/assessmentItem.module';
 import { StudentItemGradeModule } from './student-item-Grade/student-item-grade.module';
 
 // <database-block>
@@ -128,7 +127,7 @@ const infrastructureDatabaseModule = (databaseConfig() as DatabaseConfig)
     NotificationModule,
     EnquiriesModule,
     AssigmentModule,
-    AssessmentItemModule,
+  
     StudentItemGradeModule
   ],
 })

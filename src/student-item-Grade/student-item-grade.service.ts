@@ -15,15 +15,13 @@ import {
   createManyStudentItemGradeDto,
   CreateStudentItemGradeDto,
 } from './dto/create-student-item-grade.dto';
-import { AssessmentItem } from '../assessment-Items/schema/assessmentItem.schema';
 
 @Injectable()
 export class StudentItemGradeService {
   constructor(
     @InjectModel(StudentItemGrade.name)
     private readonly gradeModel: Model<StudentItemGrade>,
-    @InjectModel(AssessmentItem.name)
-    private readonly assessmentItemModel: Model<AssessmentItem>,
+   
   ) {}
 
   private map(doc: any): any {
@@ -123,64 +121,5 @@ export class StudentItemGradeService {
     return { message: 'Grade removed successfully' };
   }
 
-  async resultPassFail(courseId: string, studentId: string) {
-    const assessmentItems = await this.assessmentItemModel
-      .find({
-        courseId: new Types.ObjectId(courseId),
-      })
-      .lean();
-
-    if (!assessmentItems || assessmentItems.length === 0) {
-      throw new NotFoundException(
-        'Assessment items not foundsss for thisss coursse',
-      );
-    }
-
-    // Total max marks across all assessment items of this course
-    const totalMaxMarks = assessmentItems.reduce(
-      (acc: number, item: any) => acc + (item.maxMarks || 0),
-      0,
-    );
-
-    if (totalMaxMarks === 0) {
-      throw new BadRequestException('Total max marks is zero');
-    }
-
-    const grades = await this.gradeModel
-      .find({
-        studentId: new Types.ObjectId(studentId),
-        assessmentItemId: {
-          $in: assessmentItems.map((item: any) => item._id),
-        },
-      })
-      .lean();
-
-    if (!grades || grades.length === 0) {
-      throw new NotFoundException('Grades not found for this student');
-    }
-
-    const studentMarks = grades.reduce(
-      (sum: number, grade: any) => sum + (grade.obtainedMarks || 0),
-      0,
-    );
-
-    const passFailStatus = Number(
-      ((studentMarks / totalMaxMarks) * 100).toFixed(2),
-    );
-    if (passFailStatus >= 70) {
-      return {
-        message: 'Pass',
-        result: `${passFailStatus}%`,
-        totalQuestionMarks: totalMaxMarks,
-        studentMarks: studentMarks,
-      };
-    } else {
-      return {
-        message: 'Fail',
-        result: `${passFailStatus}%`,
-        totalQuestionMarks: totalMaxMarks,
-        studentMarks: studentMarks,
-      };
-    }
-  }
+  
 }
