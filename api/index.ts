@@ -76,7 +76,12 @@ async function bootstrap() {
     ) => {
       if (!origin) return callback(null, true); // mobile apps, curl, postman
 
-      if (allowedOrigins.includes(origin)) {
+      // Allow Vercel domains for Swagger UI
+      if (
+        origin.includes('vercel.app') ||
+        origin.includes('localhost') ||
+        allowedOrigins.includes(origin)
+      ) {
         return callback(null, true);
       }
 
@@ -90,7 +95,7 @@ async function bootstrap() {
 
   // Global Prefix
   app.setGlobalPrefix(configService.get('app.apiPrefix', 'api'), {
-    exclude: ['/'],
+    exclude: ['/', 'docs', 'docs-json'],
   });
 
   // API Versioning
@@ -126,7 +131,11 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, options);
-  SwaggerModule.setup('docs', app, document);
+  SwaggerModule.setup('docs', app, document, {
+    swaggerOptions: {
+      persistAuthorization: true,
+    },
+  });
 
   await app.init();
   isBootstrapped = true;
