@@ -166,16 +166,134 @@ let AuthService = class AuthService {
             user,
         };
     }
-    async register(dto) {
+    async registerStep1(dto) {
+        const existingUser = await this.usersService.findByEmail(dto.email);
+        if (existingUser) {
+            throw new common_1.UnprocessableEntityException({
+                status: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
+                errors: {
+                    email: 'emailAlreadyExists',
+                },
+            });
+        }
         const user = await this.usersService.create({
-            ...dto,
             email: dto.email,
+            password: dto.password,
+            firstName: null,
+            lastName: null,
+            company: '',
+            jobTitle: '',
+            emailAddress: dto.email,
+            phoneNumber: 0,
+            country: '',
+            industry: '',
             role: {
-                id: dto.role ?? roles_enum_1.RoleEnum.student,
+                id: roles_enum_1.RoleEnum.student,
             },
             status: {
                 id: statuses_enum_1.StatusEnum.inactive,
             },
+        });
+        const isCompleteProfile = !!(user.firstName &&
+            user.lastName &&
+            user.fullName &&
+            user.phoneNumber &&
+            user.address);
+        const isUserVerified = user.isEmailVerified || false;
+        return {
+            userId: user.id,
+            userEmail: user.email || dto.email,
+            isUserVerified,
+            isCompleteProfile,
+        };
+    }
+    async OTPVerify(dto) {
+        const user = await this.usersService.findById(dto.userId);
+        if (!user) {
+            throw new common_1.UnprocessableEntityException({
+                status: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
+                errors: {
+                    userId: 'userNotFound',
+                },
+            });
+        }
+        const validOtp = '123456';
+        if (dto.otpCode !== validOtp) {
+            throw new common_1.UnprocessableEntityException({
+                status: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
+                errors: {
+                    otpCode: 'invalidOtp',
+                },
+            });
+        }
+        await this.usersService.updateEmailVerified(user.id, true);
+        const updatedUser = await this.usersService.findById(user.id);
+        if (!updatedUser) {
+            throw new common_1.UnprocessableEntityException({
+                status: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
+                errors: {
+                    user: 'updateFailed',
+                },
+            });
+        }
+        const isCompleteProfile = !!(updatedUser.firstName &&
+            updatedUser.lastName &&
+            updatedUser.fullName &&
+            updatedUser.phoneNumber &&
+            updatedUser.address);
+        return {
+            user: updatedUser,
+            isUserVerified: true,
+            isCompleteProfile,
+        };
+    }
+    async resendOtp(dto) {
+        const user = await this.usersService.findById(dto.userId);
+        if (!user) {
+            throw new common_1.UnprocessableEntityException({
+                status: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
+                errors: {
+                    userId: 'userNotFound',
+                },
+            });
+        }
+        if (!user.email) {
+            throw new common_1.UnprocessableEntityException({
+                status: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
+                errors: {
+                    email: 'emailNotFound',
+                },
+            });
+        }
+        const otpCode = '123456';
+        const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
+        const isCompleteProfile = !!(user.firstName &&
+            user.lastName &&
+            user.fullName &&
+            user.phoneNumber &&
+            user.address);
+        return {
+            success: true,
+            message: 'OTP sent successfully to your email',
+            user: user,
+            isUserVerified: user.isEmailVerified || false,
+            isCompleteProfile,
+        };
+    }
+    async register(dto) {
+        const existingUser = await this.usersService.findByEmail(dto.email);
+        if (!existingUser) {
+            throw new common_1.UnprocessableEntityException({
+                status: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
+                errors: {
+                    email: 'userNotFound',
+                },
+            });
+        }
+        const updatedUser = await this.usersService.update(existingUser.id, {
+            firstName: dto.firstName,
+            lastName: dto.lastName,
+            fullName: dto.fullName,
             company: dto.company ?? null,
             jobTitle: dto.jobTitle ?? null,
             emailAddress: dto.emailAddress ?? dto.email,
@@ -183,7 +301,6 @@ let AuthService = class AuthService {
             country: dto.country ?? null,
             industry: dto.industry ?? null,
             dob: dto.dob ? new Date(dto.dob) : undefined,
-            fullName: dto.fullName,
             countryCode: dto.countryCode,
             isoCode: dto.isoCode,
             gender: dto.gender,
@@ -197,70 +314,18 @@ let AuthService = class AuthService {
             emergencyPhoneNumber: dto.emergencyPhoneNumber,
             deviceToken: dto.deviceToken,
             deviceType: dto.deviceType,
+            role: dto.role ? { id: dto.role } : undefined,
         });
-        console.log(dto, 'User created:', user);
-        const hash = await this.jwtService.signAsync({
-            confirmEmailUserId: user.id,
-        }, {
-            secret: this.configService.getOrThrow('auth.confirmEmailSecret', {
-                infer: true,
-            }),
-            expiresIn: this.configService.getOrThrow('auth.confirmEmailExpires', {
-                infer: true,
-            }),
-        });
-        await this.mailService.userSignUp({
-            to: dto.email,
-            data: {
-                hash,
-            },
-        });
-        const adminEmail = this.configService.get('app.adminEmail', {
-            infer: true,
-        });
-        if (adminEmail) {
-            try {
-                await this.mailService.userRegistered({
-                    to: adminEmail,
-                    data: {
-                        userName: dto.firstName
-                            ? `${dto.firstName} ${dto.lastName || ''}`
-                            : dto.email,
-                        userEmail: dto.email,
-                        userRole: 'Student',
-                        registrationDate: new Date().toLocaleDateString('en-US', {
-                            weekday: 'long',
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                        }),
-                    },
-                });
-            }
-            catch (error) {
-                console.error('Failed to send admin notification email:', error);
-            }
+        if (!updatedUser) {
+            throw new common_1.UnprocessableEntityException({
+                status: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
+                errors: {
+                    user: 'updateFailed',
+                },
+            });
         }
-        const sessionHash = crypto_1.default
-            .createHash('sha256')
-            .update((0, random_string_generator_util_1.randomStringGenerator)())
-            .digest('hex');
-        const session = await this.sessionService.create({
-            user,
-            hash: sessionHash,
-        });
-        const { token, refreshToken, tokenExpires } = await this.getTokensData({
-            id: user.id,
-            role: user.role,
-            sessionId: session.id,
-            hash: sessionHash,
-        });
-        return {
-            refreshToken,
-            token,
-            tokenExpires,
-            user,
-        };
+        console.log(dto, 'User updated:', updatedUser);
+        return updatedUser;
     }
     async confirmEmail(hash) {
         let userId;

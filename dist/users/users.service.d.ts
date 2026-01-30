@@ -27,5 +27,6 @@ export declare class UsersService {
         provider: User['provider'];
     }): Promise<NullableType<User>>;
     update(id: User['id'], updateUserDto: UpdateUserDto): Promise<User | null>;
+    updateEmailVerified(id: User['id'], isEmailVerified: boolean): Promise<User | null>;
     remove(id: User['id']): Promise<void>;
 }

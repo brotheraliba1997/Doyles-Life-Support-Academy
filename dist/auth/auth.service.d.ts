@@ -13,6 +13,12 @@ import { AllConfigType } from '../config/config.type';
 import { MailService } from '../mail/mail.service';
 import { SessionService } from '../session/session.service';
 import { User } from '../users/domain/user';
+import { AuthRegisterStep1Dto } from './dto/auth-register-step1.dto';
+import { AuthOtpVerifyDto } from './dto/auth-otp-verify.dto';
+import { AuthResendOtpDto } from './dto/auth-resend-otp.dto';
+import { ResendOtpResponseDto } from './dto/resend-otp-response.dto';
+import { OtpVerifyResponseDto } from './dto/otp-verify-response.dto';
+import { RegisterStep1ResponseDto } from './dto/register-step1-response.dto';
 export declare class AuthService {
     private jwtService;
     private usersService;
@@ -22,7 +28,10 @@ export declare class AuthService {
     constructor(jwtService: JwtService, usersService: UsersService, sessionService: SessionService, mailService: MailService, configService: ConfigService<AllConfigType>);
     validateLogin(loginDto: AuthEmailLoginDto): Promise<LoginResponseDto>;
     validateSocialLogin(authProvider: string, socialData: SocialInterface): Promise<LoginResponseDto>;
-    register(dto: AuthRegisterLoginDto): Promise<LoginResponseDto>;
+    registerStep1(dto: AuthRegisterStep1Dto): Promise<RegisterStep1ResponseDto>;
+    OTPVerify(dto: AuthOtpVerifyDto): Promise<OtpVerifyResponseDto>;
+    resendOtp(dto: AuthResendOtpDto): Promise<ResendOtpResponseDto>;
+    register(dto: AuthRegisterLoginDto): Promise<User>;
     confirmEmail(hash: string): Promise<void>;
     confirmNewEmail(hash: string): Promise<void>;
     forgotPassword(email: string): Promise<void>;

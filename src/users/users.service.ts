@@ -60,6 +60,7 @@ export class UsersService {
       deletedAt: sanitized.deletedAt,
       isDeleted: sanitized.isDeleted,
       isActive: sanitized.isActive,
+      isEmailVerified: sanitized.isEmailVerified,
     };
   }
 
@@ -371,6 +372,16 @@ export class UsersService {
         },
         { new: true },
       )
+      .lean();
+    return updated ? this.map(updated) : null;
+  }
+
+  async updateEmailVerified(
+    id: User['id'],
+    isEmailVerified: boolean,
+  ): Promise<User | null> {
+    const updated = await this.userModel
+      .findByIdAndUpdate(id,{ isEmailVerified },{ new: true })
       .lean();
     return updated ? this.map(updated) : null;
   }

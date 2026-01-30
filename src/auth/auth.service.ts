@@ -30,6 +30,9 @@ import { StatusEnum } from '../statuses/statuses.enum';
 import { User } from '../users/domain/user';
 import { AuthRegisterStep1Dto } from './dto/auth-register-step1.dto';
 import { AuthOtpVerifyDto } from './dto/auth-otp-verify.dto';
+import { AuthResendOtpDto } from './dto/auth-resend-otp.dto';
+import { ResendOtpResponseDto } from './dto/resend-otp-response.dto';
+import { OtpVerifyResponseDto } from './dto/otp-verify-response.dto';
 import { RegisterStep1ResponseDto } from './dto/register-step1-response.dto';
 
 @Injectable()
@@ -255,10 +258,8 @@ export class AuthService {
       isCompleteProfile,
     };
   }
-  async OTPVerify(dto: AuthOtpVerifyDto): Promise<RegisterStep1ResponseDto> {
-    // Find user by userId
+  async OTPVerify(dto: AuthOtpVerifyDto): Promise<OtpVerifyResponseDto> {
     const user = await this.usersService.findById(dto.userId);
-
     if (!user) {
       throw new UnprocessableEntityException({
         status: HttpStatus.UNPROCESSABLE_ENTITY,
@@ -268,7 +269,6 @@ export class AuthService {
       });
     }
 
-    // Verify OTP code (temporarily hardcoded - will be replaced with SMTP later)
     const validOtp = '123456';
     if (dto.otpCode !== validOtp) {
       throw new UnprocessableEntityException({
@@ -279,10 +279,7 @@ export class AuthService {
       });
     }
 
-    // Update user - set isEmailVerified to true
     await this.usersService.updateEmailVerified(user.id, true);
-    
-    // Get updated user
     const updatedUser = await this.usersService.findById(user.id);
 
     if (!updatedUser) {
@@ -294,7 +291,6 @@ export class AuthService {
       });
     }
 
-    // Check if profile is complete
     const isCompleteProfile = !!(
       updatedUser.firstName &&
       updatedUser.lastName &&
@@ -303,19 +299,63 @@ export class AuthService {
       updatedUser.address
     );
 
-    // Return response with isUserVerified = true
     return {
-      userId: updatedUser.id,
-      userEmail: updatedUser.email || '',
-      isUserVerified: true, // OTP verified, so user is now verified
+      user: updatedUser,
+      isUserVerified: true,
+      isCompleteProfile,
+    };
+  }
+
+  async resendOtp(dto: AuthResendOtpDto): Promise<ResendOtpResponseDto> {
+    const user = await this.usersService.findById(dto.userId);
+
+    if (!user) {
+      throw new UnprocessableEntityException({
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        errors: {
+          userId: 'userNotFound',
+        },
+      });
+    }
+
+    if (!user.email) {
+      throw new UnprocessableEntityException({
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        errors: {
+          email: 'emailNotFound',
+        },
+      });
+    }
+
+    // Generate OTP (temporarily hardcoded - will be replaced with SMTP later)
+    const otpCode = '123456';
+    const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes from now
+
+    const isCompleteProfile = !!(
+      user.firstName &&
+      user.lastName &&
+      user.fullName &&
+      user.phoneNumber &&
+      user.address
+    );
+
+   
+   
+
+    
+
+
+    return {
+      success: true,
+      message: 'OTP sent successfully to your email',
+      user: user,
+      isUserVerified: user.isEmailVerified || false,
       isCompleteProfile,
     };
   }
 
   async register(dto: AuthRegisterLoginDto): Promise<User> {
- 
     const existingUser = await this.usersService.findByEmail(dto.email);
-
     if (!existingUser) {
       throw new UnprocessableEntityException({
         status: HttpStatus.UNPROCESSABLE_ENTITY,

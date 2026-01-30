@@ -202,4 +202,8 @@ __decorate([
     (0, swagger_1.ApiProperty)(),
     __metadata("design:type", Boolean)
 ], User.prototype, "isActive", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    __metadata("design:type", Boolean)
+], User.prototype, "isEmailVerified", void 0);
 //# sourceMappingURL=user.js.map

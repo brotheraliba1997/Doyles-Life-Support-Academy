@@ -134,4 +134,4 @@ exports.AttendanceSchema.index({ student: 1 });
 exports.AttendanceSchema.index({ markedBy: 1 });
 exports.AttendanceSchema.index({ status: 1 });
 exports.AttendanceSchema.index({ markedAt: -1 });
-//# sourceMappingURL=attendance.schema.js.mapssss
+//# sourceMappingURL=attendance.schema.js.map

@@ -56,6 +56,7 @@ let UsersService = class UsersService {
             deletedAt: sanitized.deletedAt,
             isDeleted: sanitized.isDeleted,
             isActive: sanitized.isActive,
+            isEmailVerified: sanitized.isEmailVerified,
         };
     }
     async create(createUserDto) {
@@ -286,6 +287,12 @@ let UsersService = class UsersService {
             provider: updateUserDto.provider,
             socialId: updateUserDto.socialId,
         }, { new: true })
+            .lean();
+        return updated ? this.map(updated) : null;
+    }
+    async updateEmailVerified(id, isEmailVerified) {
+        const updated = await this.userModel
+            .findByIdAndUpdate(id, { isEmailVerified }, { new: true })
             .lean();
         return updated ? this.map(updated) : null;
     }

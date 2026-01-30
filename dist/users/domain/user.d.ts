@@ -39,4 +39,5 @@ export declare class User {
     deletedAt: Date;
     isDeleted: boolean;
     isActive: boolean;
+    isEmailVerified?: boolean;
 }

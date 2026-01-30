@@ -26,12 +26,27 @@ const auth_register_login_dto_1 = require("./dto/auth-register-login.dto");
 const login_response_dto_1 = require("./dto/login-response.dto");
 const user_1 = require("../users/domain/user");
 const refresh_response_dto_1 = require("./dto/refresh-response.dto");
+const auth_register_step1_dto_1 = require("./dto/auth-register-step1.dto");
+const register_step1_response_dto_1 = require("./dto/register-step1-response.dto");
+const auth_otp_verify_dto_1 = require("./dto/auth-otp-verify.dto");
+const auth_resend_otp_dto_1 = require("./dto/auth-resend-otp.dto");
+const resend_otp_response_dto_1 = require("./dto/resend-otp-response.dto");
+const otp_verify_response_dto_1 = require("./dto/otp-verify-response.dto");
 let AuthController = class AuthController {
     constructor(service) {
         this.service = service;
     }
     login(loginDto) {
         return this.service.validateLogin(loginDto);
+    }
+    async registerStep1(createUserDto) {
+        return this.service.registerStep1(createUserDto);
+    }
+    async OTPVerify(otpVerifyDto) {
+        return this.service.OTPVerify(otpVerifyDto);
+    }
+    async resendOtp(resendOtpDto) {
+        return this.service.resendOtp(resendOtpDto);
     }
     async register(createUserDto) {
         return this.service.register(createUserDto);
@@ -84,7 +99,34 @@ __decorate([
 ], AuthController.prototype, "login", null);
 __decorate([
     (0, common_1.Post)('email/register'),
-    (0, swagger_1.ApiOkResponse)({ type: login_response_dto_1.LoginResponseDto }),
+    (0, swagger_1.ApiOkResponse)({ type: register_step1_response_dto_1.RegisterStep1ResponseDto }),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [auth_register_step1_dto_1.AuthRegisterStep1Dto]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "registerStep1", null);
+__decorate([
+    (0, common_1.Post)('OTP/verify'),
+    (0, swagger_1.ApiOkResponse)({ type: otp_verify_response_dto_1.OtpVerifyResponseDto }),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [auth_otp_verify_dto_1.AuthOtpVerifyDto]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "OTPVerify", null);
+__decorate([
+    (0, common_1.Post)('OTP/resend'),
+    (0, swagger_1.ApiOkResponse)({ type: resend_otp_response_dto_1.ResendOtpResponseDto }),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [auth_resend_otp_dto_1.AuthResendOtpDto]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "resendOtp", null);
+__decorate([
+    (0, common_1.Post)('/register/complete'),
+    (0, swagger_1.ApiOkResponse)({ type: user_1.User }),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
