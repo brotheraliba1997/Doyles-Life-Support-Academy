@@ -24,6 +24,12 @@ import { LoginResponseDto } from './dto/login-response.dto';
 import { NullableType } from '../utils/types/nullable.type';
 import { User } from '../users/domain/user';
 import { RefreshResponseDto } from './dto/refresh-response.dto';
+import { AuthRegisterStep1Dto } from './dto/auth-register-step1.dto';
+import { RegisterStep1ResponseDto } from './dto/register-step1-response.dto';
+import { AuthOtpVerifyDto } from './dto/auth-otp-verify.dto';
+import { AuthResendOtpDto } from './dto/auth-resend-otp.dto';
+import { ResendOtpResponseDto } from './dto/resend-otp-response.dto';
+import { OtpVerifyResponseDto } from './dto/otp-verify-response.dto';
 
 @ApiTags('Auth')
 @Controller({
@@ -44,11 +50,42 @@ export class AuthController {
   }
 
   @Post('email/register')
-  @ApiOkResponse({ type: LoginResponseDto })
+  @ApiOkResponse({ type: RegisterStep1ResponseDto })
+  @HttpCode(HttpStatus.OK)
+  async registerStep1(
+    @Body() createUserDto: AuthRegisterStep1Dto,
+  ): Promise<RegisterStep1ResponseDto> {
+    return this.service.registerStep1(createUserDto);
+  }
+
+
+
+  @Post('OTP/verify')
+  @ApiOkResponse({ type: OtpVerifyResponseDto })
+  @HttpCode(HttpStatus.OK)
+  async OTPVerify(
+    @Body() otpVerifyDto: AuthOtpVerifyDto,
+  ): Promise<OtpVerifyResponseDto> {
+    return this.service.OTPVerify(otpVerifyDto);
+  }
+
+  @Post('OTP/resend')
+  @ApiOkResponse({ type: ResendOtpResponseDto })
+  @HttpCode(HttpStatus.OK)
+  async resendOtp(
+    @Body() resendOtpDto: AuthResendOtpDto,
+  ): Promise<ResendOtpResponseDto> {
+    return this.service.resendOtp(resendOtpDto);
+  }
+
+
+
+  @Post('/register/complete')
+  @ApiOkResponse({ type: User })
   @HttpCode(HttpStatus.OK)
   async register(
     @Body() createUserDto: AuthRegisterLoginDto,
-  ): Promise<LoginResponseDto> {
+  ): Promise<User> {
     return this.service.register(createUserDto);
   }
 

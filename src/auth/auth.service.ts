@@ -28,6 +28,9 @@ import { Session } from '../session/domain/session';
 import { SessionService } from '../session/session.service';
 import { StatusEnum } from '../statuses/statuses.enum';
 import { User } from '../users/domain/user';
+import { AuthRegisterStep1Dto } from './dto/auth-register-step1.dto';
+import { AuthOtpVerifyDto } from './dto/auth-otp-verify.dto';
+import { RegisterStep1ResponseDto } from './dto/register-step1-response.dto';
 
 @Injectable()
 export class AuthService {
@@ -200,17 +203,133 @@ export class AuthService {
     };
   }
 
-  async register(dto: AuthRegisterLoginDto): Promise<LoginResponseDto> {
+
+
+  async registerStep1(dto: AuthRegisterStep1Dto): Promise<RegisterStep1ResponseDto> {
+    // Check if user already exists
+    const existingUser = await this.usersService.findByEmail(dto.email);
+    if (existingUser) {
+      throw new UnprocessableEntityException({
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        errors: {
+          email: 'emailAlreadyExists',
+        },
+      });
+    } 
+
     const user = await this.usersService.create({
-      ...dto,
       email: dto.email,
+      password: dto.password,
+      firstName: null,
+      lastName: null,
+      company: '',
+      jobTitle: '', 
+      emailAddress: dto.email, 
+      phoneNumber: 0, 
+      country: '', 
+      industry: '', 
       role: {
-        id: dto.role ?? RoleEnum.student,
+        id: RoleEnum.student,
       },
       status: {
         id: StatusEnum.inactive,
       },
-      
+    });
+
+    // const otpCode = '123456';
+    // const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000); 
+
+    const isCompleteProfile = !!(
+      user.firstName &&
+      user.lastName &&
+      user.fullName &&
+      user.phoneNumber &&
+      user.address
+    );
+
+    const isUserVerified = user.isEmailVerified || false;
+    return {
+      userId: user.id,
+      userEmail: user.email || dto.email,
+      isUserVerified,
+      isCompleteProfile,
+    };
+  }
+  async OTPVerify(dto: AuthOtpVerifyDto): Promise<RegisterStep1ResponseDto> {
+    // Find user by userId
+    const user = await this.usersService.findById(dto.userId);
+
+    if (!user) {
+      throw new UnprocessableEntityException({
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        errors: {
+          userId: 'userNotFound',
+        },
+      });
+    }
+
+    // Verify OTP code (temporarily hardcoded - will be replaced with SMTP later)
+    const validOtp = '123456';
+    if (dto.otpCode !== validOtp) {
+      throw new UnprocessableEntityException({
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        errors: {
+          otpCode: 'invalidOtp',
+        },
+      });
+    }
+
+    // Update user - set isEmailVerified to true
+    await this.usersService.updateEmailVerified(user.id, true);
+    
+    // Get updated user
+    const updatedUser = await this.usersService.findById(user.id);
+
+    if (!updatedUser) {
+      throw new UnprocessableEntityException({
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        errors: {
+          user: 'updateFailed',
+        },
+      });
+    }
+
+    // Check if profile is complete
+    const isCompleteProfile = !!(
+      updatedUser.firstName &&
+      updatedUser.lastName &&
+      updatedUser.fullName &&
+      updatedUser.phoneNumber &&
+      updatedUser.address
+    );
+
+    // Return response with isUserVerified = true
+    return {
+      userId: updatedUser.id,
+      userEmail: updatedUser.email || '',
+      isUserVerified: true, // OTP verified, so user is now verified
+      isCompleteProfile,
+    };
+  }
+
+  async register(dto: AuthRegisterLoginDto): Promise<User> {
+ 
+    const existingUser = await this.usersService.findByEmail(dto.email);
+
+    if (!existingUser) {
+      throw new UnprocessableEntityException({
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        errors: {
+          email: 'userNotFound',
+        },
+      });
+    }
+
+    // Update existing user with complete profile data
+    const updatedUser = await this.usersService.update(existingUser.id, {
+      firstName: dto.firstName,
+      lastName: dto.lastName,
+      fullName: dto.fullName,
       company: dto.company ?? null,
       jobTitle: dto.jobTitle ?? null,
       emailAddress: dto.emailAddress ?? dto.email,
@@ -218,7 +337,6 @@ export class AuthService {
       country: dto.country ?? null,
       industry: dto.industry ?? null,
       dob: dto.dob ? new Date(dto.dob) : undefined,
-      fullName: dto.fullName,
       countryCode: dto.countryCode,
       isoCode: dto.isoCode,
       gender: dto.gender,
@@ -230,85 +348,24 @@ export class AuthService {
       emergencyCountryCode: dto.emergencyCountryCode,
       emergencyIsoCode: dto.emergencyIsoCode,
       emergencyPhoneNumber: dto.emergencyPhoneNumber,
-      // Device fields
       deviceToken: dto.deviceToken,
       deviceType: dto.deviceType,
-    });
-    console.log(dto, 'User created:', user);
-    // ✅ Generate email confirmation token
-    const hash = await this.jwtService.signAsync(
-      {
-        confirmEmailUserId: user.id,
-      },
-      {
-        secret: this.configService.getOrThrow('auth.confirmEmailSecret', {
-          infer: true,
-        }),
-        expiresIn: this.configService.getOrThrow('auth.confirmEmailExpires', {
-          infer: true,
-        }),
-      },
-    );
-
-    // ✅ Send activation email to user
-    await this.mailService.userSignUp({
-      to: dto.email,
-      data: {
-        hash,
-      },
+      role: dto.role ? { id: dto.role } : undefined,
     });
 
-    // ✅ Notify admin about registration
-    const adminEmail = this.configService.get('app.adminEmail', {
-      infer: true,
-    });
-
-    if (adminEmail) {
-      try {
-        await this.mailService.userRegistered({
-          to: adminEmail,
-          data: {
-            userName: dto.firstName
-              ? `${dto.firstName} ${dto.lastName || ''}`
-              : dto.email,
-            userEmail: dto.email,
-            userRole: 'Student',
-            registrationDate: new Date().toLocaleDateString('en-US', {
-              weekday: 'long',
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            }),
-          },
-        });
-      } catch (error) {
-        console.error('Failed to send admin notification email:', error);
-      }
+    if (!updatedUser) {
+      throw new UnprocessableEntityException({
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        errors: {
+          user: 'updateFailed',
+        },
+      });
     }
 
-    const sessionHash = crypto
-      .createHash('sha256')
-      .update(randomStringGenerator())
-      .digest('hex');
+    console.log(dto, 'User updated:', updatedUser);
 
-    const session = await this.sessionService.create({
-      user,
-      hash: sessionHash,
-    });
-
-    const { token, refreshToken, tokenExpires } = await this.getTokensData({
-      id: user.id,
-      role: user.role,
-      sessionId: session.id,
-      hash: sessionHash,
-    });
-
-    return {
-      refreshToken,
-      token,
-      tokenExpires,
-      user,
-    };
+    // Return full user object
+    return updatedUser;
   }
 
   async confirmEmail(hash: string): Promise<void> {
