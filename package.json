@@ -155,6 +155,9 @@
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
   },
+  "overrides": {
+    "glob": "^10.3.10"
+  },
   "engines": {
     "node": "20.x",
     "npm": ">=8.0.0"
