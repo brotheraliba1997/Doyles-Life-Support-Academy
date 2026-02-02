@@ -195,6 +195,8 @@ let AuthService = class AuthService {
                 id: statuses_enum_1.StatusEnum.inactive,
             },
         });
+        const otpCode = '123456';
+        const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
         const isCompleteProfile = !!(user.firstName &&
             user.lastName &&
             user.fullName &&
@@ -332,12 +334,29 @@ let AuthService = class AuthService {
             updatedUser.phoneNumber &&
             updatedUser.address);
         const isUserVerified = updatedUser.isEmailVerified || false;
+        const hash = crypto_1.default
+            .createHash('sha256')
+            .update((0, random_string_generator_util_1.randomStringGenerator)())
+            .digest('hex');
+        const session = await this.sessionService.create({
+            user: updatedUser,
+            hash,
+        });
+        const { token, refreshToken, tokenExpires } = await this.getTokensData({
+            id: updatedUser.id,
+            role: updatedUser.role,
+            sessionId: session.id,
+            hash,
+        });
         return {
             success: true,
             data: {
-                isUserVerified: isUserVerified,
-                isCompleteProfile: isCompleteProfile,
-                user: updatedUser
+                token,
+                refreshToken,
+                tokenExpires,
+                isUserVerified,
+                isCompleteProfile,
+                user: updatedUser,
             },
             message: 'Registration completed successfully',
         };

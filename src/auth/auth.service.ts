@@ -243,8 +243,8 @@ export class AuthService {
       },
     });
 
-    // const otpCode = '123456';
-    // const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000); 
+    const otpCode = '123456';
+    const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000); 
 
     const isCompleteProfile = !!(
       user.firstName &&
@@ -263,6 +263,7 @@ export class AuthService {
         isCompleteProfile,
          id: user.id,
       email: user.email || dto.email, 
+    
       },
       message: 'Registration completed successfully',
      
@@ -425,14 +426,32 @@ export class AuthService {
 
     const isUserVerified = updatedUser.isEmailVerified || false;
 
+    const hash = crypto
+      .createHash('sha256')
+      .update(randomStringGenerator())
+      .digest('hex');
+
+    const session = await this.sessionService.create({
+      user: updatedUser,
+      hash,
+    });
+
+    const { token, refreshToken, tokenExpires } = await this.getTokensData({
+      id: updatedUser.id,
+      role: updatedUser.role,
+      sessionId: session.id,
+      hash,
+    });
+
     return {
       success: true,
       data: {
-        isUserVerified: isUserVerified,
-        isCompleteProfile: isCompleteProfile,
-       user: updatedUser
-      
-       
+        token,
+        refreshToken,
+        tokenExpires,
+        isUserVerified,
+        isCompleteProfile,
+        user: updatedUser,
       },
       message: 'Registration completed successfully',
     };

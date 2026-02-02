@@ -15,6 +15,18 @@ const user_1 = require("../../users/domain/user");
 class RegisterDataDto {
 }
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 'eyJhbGc...', description: 'JWT access token' }),
+    __metadata("design:type", String)
+], RegisterDataDto.prototype, "token", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'eyJhbGc...', description: 'JWT refresh token' }),
+    __metadata("design:type", String)
+], RegisterDataDto.prototype, "refreshToken", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 1734567890000, description: 'Token expiry timestamp' }),
+    __metadata("design:type", Number)
+], RegisterDataDto.prototype, "tokenExpires", void 0);
+__decorate([
     (0, swagger_1.ApiProperty)({ example: true, description: 'Whether the user email is verified' }),
     __metadata("design:type", Boolean)
 ], RegisterDataDto.prototype, "isUserVerified", void 0);
