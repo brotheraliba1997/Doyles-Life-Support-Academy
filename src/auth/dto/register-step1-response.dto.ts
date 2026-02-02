@@ -11,14 +11,18 @@ export class RegisterStep1ResponseDataDto {
   @ApiProperty({ example: false, description: 'Profile completion status' })
   
   isCompleteProfile: boolean;
-}
 
-export class RegisterStep1ResponseDto {
+
   @ApiProperty({ example: '507f1f77bcf86cd799439011' })
   userId: string | number;
 
   @ApiProperty({ example: 'test@example.com' })
   userEmail: string;
+  
+}
+
+export class RegisterStep1ResponseDto {
+ 
 
   @ApiProperty({ example: 201, description: 'Indicates whether the operation succeeded' })
   success: number | boolean;
