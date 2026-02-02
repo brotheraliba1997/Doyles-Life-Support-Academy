@@ -216,7 +216,7 @@ export class AuthService {
     const existingUser = await this.usersService.findByEmail(dto.email);
     if (existingUser) {
       throw new UnprocessableEntityException({
-        status: false,
+        success: false,
         message: 'User already exists',
         errors: {
           email: 'emailAlreadyExists',
@@ -271,7 +271,7 @@ export class AuthService {
     const user = await this.usersService.findById(dto.userId);
     if (!user) {
       throw new UnprocessableEntityException({
-        status: false,
+        success: false,
         message: 'User not found',
         errors: {
           userId: 'userNotFound',
@@ -282,7 +282,7 @@ export class AuthService {
     const validOtp = '123456';
     if (dto.otpCode !== validOtp) {
       throw new UnprocessableEntityException({
-        status: false,
+        success: false,
         message: 'Invalid OTP',
         errors: {
           otpCode: 'invalidOtp',
@@ -295,7 +295,7 @@ export class AuthService {
 
     if (!updatedUser) {
       throw new UnprocessableEntityException({
-        status: false,
+        success: false,
         message: 'User not found',
        
       });
@@ -326,7 +326,7 @@ export class AuthService {
 
     if (!user) {
       throw new UnprocessableEntityException({
-        status: false,
+        success: false,
         message: 'User not found',
         
       });
@@ -334,7 +334,7 @@ export class AuthService {
 
     if (!user.email) {
       throw new UnprocessableEntityException({
-        status: false,
+        success: false,
         message: 'Email not found',
      
       });
@@ -406,7 +406,7 @@ export class AuthService {
 
     if (!updatedUser) {
       throw new UnprocessableEntityException({
-        status: false,
+        success: false,
         message: 'Registration failed',
        
       });
@@ -449,7 +449,7 @@ export class AuthService {
       userId = jwtData.confirmEmailUserId;
     } catch {
       throw new UnprocessableEntityException({
-        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        success: HttpStatus.UNPROCESSABLE_ENTITY,
         errors: {
           hash: `invalidHash`,
         },
@@ -463,7 +463,7 @@ export class AuthService {
       user?.status?.id?.toString() !== StatusEnum.inactive.toString()
     ) {
       throw new NotFoundException({
-        status: HttpStatus.NOT_FOUND,
+        success: HttpStatus.NOT_FOUND,
         error: `notFound`,
       });
     }
@@ -586,7 +586,7 @@ export class AuthService {
         const currentTime = Date.now();
         if (currentTime > expiresTimestamp) {
           throw new UnprocessableEntityException({
-            status: HttpStatus.UNPROCESSABLE_ENTITY,
+            success: HttpStatus.UNPROCESSABLE_ENTITY,
             errors: {
               hash: 'expiredHash',
             },
@@ -607,7 +607,7 @@ export class AuthService {
       userId = jwtData.forgotUserId;
     } catch {
       throw new UnprocessableEntityException({
-        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        success: HttpStatus.UNPROCESSABLE_ENTITY,
         errors: {
           hash: 'invalidHash',
         },
@@ -618,7 +618,7 @@ export class AuthService {
 
     if (!user) {
       throw new UnprocessableEntityException({
-        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        success: HttpStatus.UNPROCESSABLE_ENTITY,
         errors: {
           hash: 'notFound',
         },
@@ -652,7 +652,7 @@ export class AuthService {
 
     if (!currentUser) {
       throw new UnprocessableEntityException({
-        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        success: HttpStatus.UNPROCESSABLE_ENTITY,
         errors: {
           user: 'userNotFound',
         },
@@ -662,7 +662,7 @@ export class AuthService {
     if (userDto.password) {
       if (!userDto.oldPassword) {
         throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
+          success: HttpStatus.UNPROCESSABLE_ENTITY,
           errors: {
             oldPassword: 'missingOldPassword',
           },
@@ -671,7 +671,7 @@ export class AuthService {
 
       if (!currentUser.password) {
         throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
+          success: HttpStatus.UNPROCESSABLE_ENTITY,
           errors: {
             oldPassword: 'incorrectOldPassword',
           },
@@ -685,7 +685,7 @@ export class AuthService {
 
       if (!isValidOldPassword) {
         throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
+          success: HttpStatus.UNPROCESSABLE_ENTITY,
           errors: {
             oldPassword: 'incorrectOldPassword',
           },
@@ -703,7 +703,7 @@ export class AuthService {
 
       if (userByEmail && userByEmail.id !== currentUser.id) {
         throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
+          success: HttpStatus.UNPROCESSABLE_ENTITY,
           errors: {
             email: 'emailExists',
           },
