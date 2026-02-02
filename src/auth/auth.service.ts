@@ -635,7 +635,7 @@ export class AuthService {
 
     return {
       success: true,
-      message: 'Password reset successfully',
+      message: 'Password reset successfullys',
     
     };
   }
