@@ -9,9 +9,21 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ResendOtpResponseDto = void 0;
+exports.ResendOtpResponseDto = exports.ResendOtpResponseDataDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
-const user_1 = require("../../users/domain/user");
+const class_validator_1 = require("class-validator");
+const class_transformer_1 = require("class-transformer");
+class ResendOtpResponseDataDto {
+}
+exports.ResendOtpResponseDataDto = ResendOtpResponseDataDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: false, description: 'User verification status' }),
+    __metadata("design:type", Boolean)
+], ResendOtpResponseDataDto.prototype, "isUserVerified", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: false, description: 'Profile completion status' }),
+    __metadata("design:type", Boolean)
+], ResendOtpResponseDataDto.prototype, "isCompleteProfile", void 0);
 class ResendOtpResponseDto {
 }
 exports.ResendOtpResponseDto = ResendOtpResponseDto;
@@ -24,15 +36,9 @@ __decorate([
     __metadata("design:type", String)
 ], ResendOtpResponseDto.prototype, "message", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ type: user_1.User }),
-    __metadata("design:type", user_1.User)
-], ResendOtpResponseDto.prototype, "user", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ example: false, description: 'User verification status' }),
-    __metadata("design:type", Boolean)
-], ResendOtpResponseDto.prototype, "isUserVerified", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ example: false, description: 'Profile completion status' }),
-    __metadata("design:type", Boolean)
-], ResendOtpResponseDto.prototype, "isCompleteProfile", void 0);
+    (0, swagger_1.ApiProperty)({ type: ResendOtpResponseDataDto }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_transformer_1.Type)(() => ResendOtpResponseDataDto),
+    __metadata("design:type", ResendOtpResponseDataDto)
+], ResendOtpResponseDto.prototype, "data", void 0);
 //# sourceMappingURL=resend-otp-response.dto.js.map

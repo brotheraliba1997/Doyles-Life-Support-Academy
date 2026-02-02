@@ -9,22 +9,36 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.OtpVerifyResponseDto = void 0;
+exports.OtpVerifyResponseDto = exports.RegisterStep1ResponseDataDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
-const user_1 = require("../../users/domain/user");
+const class_validator_1 = require("class-validator");
+const class_transformer_1 = require("class-transformer");
+class RegisterStep1ResponseDataDto {
+}
+exports.RegisterStep1ResponseDataDto = RegisterStep1ResponseDataDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: false, description: 'User verification status' }),
+    __metadata("design:type", Boolean)
+], RegisterStep1ResponseDataDto.prototype, "isUserVerified", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: false, description: 'Profile completion status' }),
+    __metadata("design:type", Boolean)
+], RegisterStep1ResponseDataDto.prototype, "isCompleteProfile", void 0);
 class OtpVerifyResponseDto {
 }
 exports.OtpVerifyResponseDto = OtpVerifyResponseDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ type: user_1.User }),
-    __metadata("design:type", user_1.User)
-], OtpVerifyResponseDto.prototype, "user", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ example: true, description: 'User verification status' }),
+    (0, swagger_1.ApiProperty)({ example: true, description: 'Indicates whether the operation succeeded' }),
     __metadata("design:type", Boolean)
-], OtpVerifyResponseDto.prototype, "isUserVerified", void 0);
+], OtpVerifyResponseDto.prototype, "success", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: false, description: 'Profile completion status' }),
-    __metadata("design:type", Boolean)
-], OtpVerifyResponseDto.prototype, "isCompleteProfile", void 0);
+    (0, swagger_1.ApiProperty)({ example: 'OTP verified successfully', description: 'Human-readable response message' }),
+    __metadata("design:type", String)
+], OtpVerifyResponseDto.prototype, "message", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: RegisterStep1ResponseDataDto }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_transformer_1.Type)(() => RegisterStep1ResponseDataDto),
+    __metadata("design:type", RegisterStep1ResponseDataDto)
+], OtpVerifyResponseDto.prototype, "data", void 0);
 //# sourceMappingURL=otp-verify-response.dto.js.map

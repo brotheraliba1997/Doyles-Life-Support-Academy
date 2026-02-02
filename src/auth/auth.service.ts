@@ -34,6 +34,9 @@ import { AuthResendOtpDto } from './dto/auth-resend-otp.dto';
 import { ResendOtpResponseDto } from './dto/resend-otp-response.dto';
 import { OtpVerifyResponseDto } from './dto/otp-verify-response.dto';
 import { RegisterStep1ResponseDto } from './dto/register-step1-response.dto';
+import { RegisterResponseDto } from './dto/register-response.dto';
+import { ForgotPasswordResponseDto } from './dto/forgot-password-response.dto';
+import { ResetPasswordResponseDto } from './dto/reset-password-response.dto';
 
 @Injectable()
 export class AuthService {
@@ -213,7 +216,8 @@ export class AuthService {
     const existingUser = await this.usersService.findByEmail(dto.email);
     if (existingUser) {
       throw new UnprocessableEntityException({
-        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        status: false,
+        message: 'User already exists',
         errors: {
           email: 'emailAlreadyExists',
         },
@@ -253,16 +257,22 @@ export class AuthService {
     const isUserVerified = user.isEmailVerified || false;
     return {
       userId: user.id,
-      userEmail: user.email || dto.email,
-      isUserVerified,
-      isCompleteProfile,
+      userEmail: user.email || dto.email, 
+      success: true,
+      data: {
+        isUserVerified,
+        isCompleteProfile,
+      },
+      message: 'Registration completed successfully',
+     
     };
   }
   async OTPVerify(dto: AuthOtpVerifyDto): Promise<OtpVerifyResponseDto> {
     const user = await this.usersService.findById(dto.userId);
     if (!user) {
       throw new UnprocessableEntityException({
-        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        status: false,
+        message: 'User not found',
         errors: {
           userId: 'userNotFound',
         },
@@ -272,7 +282,8 @@ export class AuthService {
     const validOtp = '123456';
     if (dto.otpCode !== validOtp) {
       throw new UnprocessableEntityException({
-        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        status: false,
+        message: 'Invalid OTP',
         errors: {
           otpCode: 'invalidOtp',
         },
@@ -284,10 +295,9 @@ export class AuthService {
 
     if (!updatedUser) {
       throw new UnprocessableEntityException({
-        status: HttpStatus.UNPROCESSABLE_ENTITY,
-        errors: {
-          user: 'updateFailed',
-        },
+        status: false,
+        message: 'User not found',
+       
       });
     }
 
@@ -300,9 +310,14 @@ export class AuthService {
     );
 
     return {
-      user: updatedUser,
-      isUserVerified: true,
-      isCompleteProfile,
+      success: true,
+      message: 'OTP verified successfully',
+      data: {
+        isUserVerified: true,
+        isCompleteProfile: isCompleteProfile,
+      }
+    
+     
     };
   }
 
@@ -311,19 +326,17 @@ export class AuthService {
 
     if (!user) {
       throw new UnprocessableEntityException({
-        status: HttpStatus.UNPROCESSABLE_ENTITY,
-        errors: {
-          userId: 'userNotFound',
-        },
+        status: false,
+        message: 'User not found',
+        
       });
     }
 
     if (!user.email) {
       throw new UnprocessableEntityException({
-        status: HttpStatus.UNPROCESSABLE_ENTITY,
-        errors: {
-          email: 'emailNotFound',
-        },
+        status: false,
+        message: 'Email not found',
+     
       });
     }
 
@@ -339,34 +352,32 @@ export class AuthService {
       user.address
     );
 
-   
-   
-
-    
-
-
     return {
       success: true,
       message: 'OTP sent successfully to your email',
-      user: user,
-      isUserVerified: user.isEmailVerified || false,
-      isCompleteProfile,
+      data: {
+        isUserVerified: user.isEmailVerified || false,
+        isCompleteProfile: isCompleteProfile,
+      },
+   
     };
   }
 
-  async register(dto: AuthRegisterLoginDto): Promise<User> {
+  async register(dto: AuthRegisterLoginDto): Promise<RegisterResponseDto> {
     const existingUser = await this.usersService.findByEmail(dto.email);
+    console.log(existingUser, 'existingUser');
     if (!existingUser) {
       throw new UnprocessableEntityException({
-        status: HttpStatus.UNPROCESSABLE_ENTITY,
-        errors: {
-          email: 'userNotFound',
-        },
+        success: false,
+        message: 'User not found or email not verified',
+      
       });
     }
+  
+  
 
     // Update existing user with complete profile data
-    const updatedUser = await this.usersService.update(existingUser.id, {
+    const updatedUser = await this.usersService.update(existingUser?.id, {
       firstName: dto.firstName,
       lastName: dto.lastName,
       fullName: dto.fullName,
@@ -395,17 +406,32 @@ export class AuthService {
 
     if (!updatedUser) {
       throw new UnprocessableEntityException({
-        status: HttpStatus.UNPROCESSABLE_ENTITY,
-        errors: {
-          user: 'updateFailed',
-        },
+        status: false,
+        message: 'Registration failed',
+       
       });
     }
 
-    console.log(dto, 'User updated:', updatedUser);
+ 
 
-    // Return full user object
-    return updatedUser;
+    const isCompleteProfile = !!(
+      updatedUser.firstName &&
+      updatedUser.lastName &&
+      updatedUser.fullName &&
+      updatedUser.phoneNumber &&
+      updatedUser.address
+    );
+
+    const isUserVerified = updatedUser.isEmailVerified || false;
+
+    return {
+      success: true,
+      data: {
+        isUserVerified: isUserVerified,
+        isCompleteProfile: isCompleteProfile,
+      },
+      message: 'Registration completed successfully',
+    };
   }
 
   async confirmEmail(hash: string): Promise<void> {
@@ -491,16 +517,13 @@ export class AuthService {
     await this.usersService.update(user.id, user);
   }
 
-  async forgotPassword(email: string): Promise<void> {
+  async forgotPassword(email: string): Promise<ForgotPasswordResponseDto> {
     const user = await this.usersService.findByEmail(email);
-
     if (!user) {
-      throw new UnprocessableEntityException({
-        status: HttpStatus.UNPROCESSABLE_ENTITY,
-        errors: {
-          email: 'emailNotExists',
-        },
-      });
+      return {
+        success: true,
+        message: 'If the email exists, a password reset link has been sents',
+      };
     }
 
     const tokenExpiresIn = this.configService.getOrThrow('auth.forgotExpires', {
@@ -521,22 +544,61 @@ export class AuthService {
       },
     );
 
-    await this.mailService.forgotPassword({
-      to: email,
-      data: {
-        hash,
-        tokenExpires,
-      },
-    });
+    // Only send email if user exists, but don't reveal this to the client
+    try {
+      await this.mailService.forgotPassword({
+        to: email,
+        data: {
+          hash,
+          tokenExpires,
+        },
+      });
+
+      return {
+        success: true,
+        message: 'If the email exists, a password reset link has been sent',
+      };
+    } catch (error) {
+     
+      console.error('Failed to send forgot password email:', error);
+     
+      return {
+        success: true,
+        message: 'If the email exists, a password reset link has been sent',
+      };
+    }
   }
 
-  async resetPassword(hash: string, password: string): Promise<void> {
+  async resetPassword(hash: string, password: string): Promise<ResetPasswordResponseDto> {
     let userId: User['id'];
+
+    // Extract JWT token from hash (remove &expires=... part if present)
+    let token = hash;
+    if (hash.includes('&expires=')) {
+      token = hash.split('&expires=')[0];
+    }
+
+    // Optionally validate expires timestamp if present
+    if (hash.includes('&expires=')) {
+      const expiresMatch = hash.match(/&expires=(\d+)/);
+      if (expiresMatch) {
+        const expiresTimestamp = parseInt(expiresMatch[1], 10);
+        const currentTime = Date.now();
+        if (currentTime > expiresTimestamp) {
+          throw new UnprocessableEntityException({
+            status: HttpStatus.UNPROCESSABLE_ENTITY,
+            errors: {
+              hash: 'expiredHash',
+            },
+          });
+        }
+      }
+    }
 
     try {
       const jwtData = await this.jwtService.verifyAsync<{
         forgotUserId: User['id'];
-      }>(hash, {
+      }>(token, {
         secret: this.configService.getOrThrow('auth.forgotSecret', {
           infer: true,
         }),
@@ -547,7 +609,7 @@ export class AuthService {
       throw new UnprocessableEntityException({
         status: HttpStatus.UNPROCESSABLE_ENTITY,
         errors: {
-          hash: `invalidHash`,
+          hash: 'invalidHash',
         },
       });
     }
@@ -558,7 +620,7 @@ export class AuthService {
       throw new UnprocessableEntityException({
         status: HttpStatus.UNPROCESSABLE_ENTITY,
         errors: {
-          hash: `notFound`,
+          hash: 'notFound',
         },
       });
     }
@@ -570,6 +632,12 @@ export class AuthService {
     });
 
     await this.usersService.update(user.id, user);
+
+    return {
+      success: true,
+      message: 'Password reset successfully',
+    
+    };
   }
 
   async me(userJwtPayload: JwtPayloadType): Promise<NullableType<User>> {

@@ -1,8 +1,9 @@
-import { User } from '../../users/domain/user';
+export declare class ResendOtpResponseDataDto {
+    isUserVerified: boolean;
+    isCompleteProfile: boolean;
+}
 export declare class ResendOtpResponseDto {
     success: boolean;
     message: string;
-    user: User;
-    isUserVerified: boolean;
-    isCompleteProfile: boolean;
+    data: ResendOtpResponseDataDto;
 }

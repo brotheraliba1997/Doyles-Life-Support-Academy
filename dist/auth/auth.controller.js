@@ -32,6 +32,9 @@ const auth_otp_verify_dto_1 = require("./dto/auth-otp-verify.dto");
 const auth_resend_otp_dto_1 = require("./dto/auth-resend-otp.dto");
 const resend_otp_response_dto_1 = require("./dto/resend-otp-response.dto");
 const otp_verify_response_dto_1 = require("./dto/otp-verify-response.dto");
+const register_response_dto_1 = require("./dto/register-response.dto");
+const forgot_password_response_dto_1 = require("./dto/forgot-password-response.dto");
+const reset_password_response_dto_1 = require("./dto/reset-password-response.dto");
 let AuthController = class AuthController {
     constructor(service) {
         this.service = service;
@@ -126,7 +129,7 @@ __decorate([
 ], AuthController.prototype, "resendOtp", null);
 __decorate([
     (0, common_1.Post)('/register/complete'),
-    (0, swagger_1.ApiOkResponse)({ type: user_1.User }),
+    (0, swagger_1.ApiOkResponse)({ type: register_response_dto_1.RegisterResponseDto }),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -151,7 +154,8 @@ __decorate([
 ], AuthController.prototype, "confirmNewEmail", null);
 __decorate([
     (0, common_1.Post)('forgot/password'),
-    (0, common_1.HttpCode)(common_1.HttpStatus.NO_CONTENT),
+    (0, swagger_1.ApiOkResponse)({ type: forgot_password_response_dto_1.ForgotPasswordResponseDto }),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [auth_forgot_password_dto_1.AuthForgotPasswordDto]),
@@ -159,7 +163,8 @@ __decorate([
 ], AuthController.prototype, "forgotPassword", null);
 __decorate([
     (0, common_1.Post)('reset/password'),
-    (0, common_1.HttpCode)(common_1.HttpStatus.NO_CONTENT),
+    (0, swagger_1.ApiOkResponse)({ type: reset_password_response_dto_1.ResetPasswordResponseDto }),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [auth_reset_password_dto_1.AuthResetPasswordDto]),

@@ -11,6 +11,7 @@ import facebookConfig from './auth-facebook/config/facebook.config';
 import googleConfig from './auth-google/config/google.config';
 import appleConfig from './auth-apple/config/apple.config';
 import path from 'path';
+import fs from 'fs';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthAppleModule } from './auth-apple/auth-apple.module';
@@ -79,12 +80,23 @@ const infrastructureDatabaseModule = (databaseConfig() as DatabaseConfig)
     }),
     infrastructureDatabaseModule,
     I18nModule.forRootAsync({
-      useFactory: (configService: ConfigService<AllConfigType>) => ({
-        fallbackLanguage: configService.getOrThrow('app.fallbackLanguage', {
+      useFactory: (configService: ConfigService<AllConfigType>) => {
+        const workingDirectory = configService.getOrThrow('app.workingDirectory', {
           infer: true,
-        }),
-        loaderOptions: { path: path.join(__dirname, '/i18n/'), watch: true },
-      }),
+        });
+        // Try dist/i18n first (for production), then src/i18n (for development)
+        const distI18nPath = path.join(workingDirectory, 'dist', 'i18n');
+        const srcI18nPath = path.join(workingDirectory, 'src', 'i18n');
+        // Use fs to check which path exists, default to src/i18n for development
+        const i18nPath = fs.existsSync(distI18nPath) ? distI18nPath : srcI18nPath;
+        
+        return {
+          fallbackLanguage: configService.getOrThrow('app.fallbackLanguage', {
+            infer: true,
+          }),
+          loaderOptions: { path: i18nPath, watch: true },
+        };
+      },
       resolvers: [
         {
           use: HeaderResolver,

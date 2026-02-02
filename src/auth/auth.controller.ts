@@ -30,6 +30,9 @@ import { AuthOtpVerifyDto } from './dto/auth-otp-verify.dto';
 import { AuthResendOtpDto } from './dto/auth-resend-otp.dto';
 import { ResendOtpResponseDto } from './dto/resend-otp-response.dto';
 import { OtpVerifyResponseDto } from './dto/otp-verify-response.dto';
+import { RegisterResponseDto } from './dto/register-response.dto';
+import { ForgotPasswordResponseDto } from './dto/forgot-password-response.dto';
+import { ResetPasswordResponseDto } from './dto/reset-password-response.dto';
 
 @ApiTags('Auth')
 @Controller({
@@ -81,11 +84,11 @@ export class AuthController {
 
 
   @Post('/register/complete')
-  @ApiOkResponse({ type: User })
+  @ApiOkResponse({ type: RegisterResponseDto })
   @HttpCode(HttpStatus.OK)
   async register(
     @Body() createUserDto: AuthRegisterLoginDto,
-  ): Promise<User> {
+  ): Promise<RegisterResponseDto> {
     return this.service.register(createUserDto);
   }
 
@@ -106,16 +109,18 @@ export class AuthController {
   }
 
   @Post('forgot/password')
-  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOkResponse({ type: ForgotPasswordResponseDto })
+  @HttpCode(HttpStatus.OK)
   async forgotPassword(
     @Body() forgotPasswordDto: AuthForgotPasswordDto,
-  ): Promise<void> {
+  ): Promise<ForgotPasswordResponseDto> {
     return this.service.forgotPassword(forgotPasswordDto.email);
   }
 
   @Post('reset/password')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  resetPassword(@Body() resetPasswordDto: AuthResetPasswordDto): Promise<void> {
+  @ApiOkResponse({ type: ResetPasswordResponseDto })
+  @HttpCode(HttpStatus.OK)
+  resetPassword(@Body() resetPasswordDto: AuthResetPasswordDto): Promise<ResetPasswordResponseDto> {
     return this.service.resetPassword(
       resetPasswordDto.hash,
       resetPasswordDto.password,

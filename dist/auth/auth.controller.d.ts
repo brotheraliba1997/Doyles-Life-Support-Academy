@@ -15,6 +15,9 @@ import { AuthOtpVerifyDto } from './dto/auth-otp-verify.dto';
 import { AuthResendOtpDto } from './dto/auth-resend-otp.dto';
 import { ResendOtpResponseDto } from './dto/resend-otp-response.dto';
 import { OtpVerifyResponseDto } from './dto/otp-verify-response.dto';
+import { RegisterResponseDto } from './dto/register-response.dto';
+import { ForgotPasswordResponseDto } from './dto/forgot-password-response.dto';
+import { ResetPasswordResponseDto } from './dto/reset-password-response.dto';
 export declare class AuthController {
     private readonly service;
     constructor(service: AuthService);
@@ -22,11 +25,11 @@ export declare class AuthController {
     registerStep1(createUserDto: AuthRegisterStep1Dto): Promise<RegisterStep1ResponseDto>;
     OTPVerify(otpVerifyDto: AuthOtpVerifyDto): Promise<OtpVerifyResponseDto>;
     resendOtp(resendOtpDto: AuthResendOtpDto): Promise<ResendOtpResponseDto>;
-    register(createUserDto: AuthRegisterLoginDto): Promise<User>;
+    register(createUserDto: AuthRegisterLoginDto): Promise<RegisterResponseDto>;
     confirmEmail(confirmEmailDto: AuthConfirmEmailDto): Promise<void>;
     confirmNewEmail(confirmEmailDto: AuthConfirmEmailDto): Promise<void>;
-    forgotPassword(forgotPasswordDto: AuthForgotPasswordDto): Promise<void>;
-    resetPassword(resetPasswordDto: AuthResetPasswordDto): Promise<void>;
+    forgotPassword(forgotPasswordDto: AuthForgotPasswordDto): Promise<ForgotPasswordResponseDto>;
+    resetPassword(resetPasswordDto: AuthResetPasswordDto): Promise<ResetPasswordResponseDto>;
     me(request: any): Promise<NullableType<User>>;
     refresh(request: any): Promise<RefreshResponseDto>;
     logout(request: any): Promise<void>;

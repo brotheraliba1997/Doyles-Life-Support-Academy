@@ -9,8 +9,21 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.RegisterStep1ResponseDto = void 0;
+exports.RegisterStep1ResponseDto = exports.RegisterStep1ResponseDataDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
+const class_transformer_1 = require("class-transformer");
+const class_validator_1 = require("class-validator");
+class RegisterStep1ResponseDataDto {
+}
+exports.RegisterStep1ResponseDataDto = RegisterStep1ResponseDataDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: false, description: 'User verification status' }),
+    __metadata("design:type", Boolean)
+], RegisterStep1ResponseDataDto.prototype, "isUserVerified", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: false, description: 'Profile completion status' }),
+    __metadata("design:type", Boolean)
+], RegisterStep1ResponseDataDto.prototype, "isCompleteProfile", void 0);
 class RegisterStep1ResponseDto {
 }
 exports.RegisterStep1ResponseDto = RegisterStep1ResponseDto;
@@ -23,11 +36,17 @@ __decorate([
     __metadata("design:type", String)
 ], RegisterStep1ResponseDto.prototype, "userEmail", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: false, description: 'User verification status' }),
-    __metadata("design:type", Boolean)
-], RegisterStep1ResponseDto.prototype, "isUserVerified", void 0);
+    (0, swagger_1.ApiProperty)({ example: 201, description: 'Indicates whether the operation succeeded' }),
+    __metadata("design:type", Object)
+], RegisterStep1ResponseDto.prototype, "success", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: false, description: 'Profile completion status' }),
-    __metadata("design:type", Boolean)
-], RegisterStep1ResponseDto.prototype, "isCompleteProfile", void 0);
+    (0, swagger_1.ApiProperty)({ example: 'Registration completed successfully', description: 'Human-readable response message' }),
+    __metadata("design:type", String)
+], RegisterStep1ResponseDto.prototype, "message", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: RegisterStep1ResponseDataDto }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_transformer_1.Type)(() => RegisterStep1ResponseDataDto),
+    __metadata("design:type", RegisterStep1ResponseDataDto)
+], RegisterStep1ResponseDto.prototype, "data", void 0);
 //# sourceMappingURL=register-step1-response.dto.js.map

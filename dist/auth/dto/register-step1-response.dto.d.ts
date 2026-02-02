@@ -1,6 +1,11 @@
+export declare class RegisterStep1ResponseDataDto {
+    isUserVerified: boolean;
+    isCompleteProfile: boolean;
+}
 export declare class RegisterStep1ResponseDto {
     userId: string | number;
     userEmail: string;
-    isUserVerified: boolean;
-    isCompleteProfile: boolean;
+    success: number | boolean;
+    message: string;
+    data: RegisterStep1ResponseDataDto;
 }

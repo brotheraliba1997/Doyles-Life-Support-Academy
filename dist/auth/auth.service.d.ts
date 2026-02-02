@@ -19,6 +19,9 @@ import { AuthResendOtpDto } from './dto/auth-resend-otp.dto';
 import { ResendOtpResponseDto } from './dto/resend-otp-response.dto';
 import { OtpVerifyResponseDto } from './dto/otp-verify-response.dto';
 import { RegisterStep1ResponseDto } from './dto/register-step1-response.dto';
+import { RegisterResponseDto } from './dto/register-response.dto';
+import { ForgotPasswordResponseDto } from './dto/forgot-password-response.dto';
+import { ResetPasswordResponseDto } from './dto/reset-password-response.dto';
 export declare class AuthService {
     private jwtService;
     private usersService;
@@ -31,11 +34,11 @@ export declare class AuthService {
     registerStep1(dto: AuthRegisterStep1Dto): Promise<RegisterStep1ResponseDto>;
     OTPVerify(dto: AuthOtpVerifyDto): Promise<OtpVerifyResponseDto>;
     resendOtp(dto: AuthResendOtpDto): Promise<ResendOtpResponseDto>;
-    register(dto: AuthRegisterLoginDto): Promise<User>;
+    register(dto: AuthRegisterLoginDto): Promise<RegisterResponseDto>;
     confirmEmail(hash: string): Promise<void>;
     confirmNewEmail(hash: string): Promise<void>;
-    forgotPassword(email: string): Promise<void>;
-    resetPassword(hash: string, password: string): Promise<void>;
+    forgotPassword(email: string): Promise<ForgotPasswordResponseDto>;
+    resetPassword(hash: string, password: string): Promise<ResetPasswordResponseDto>;
     me(userJwtPayload: JwtPayloadType): Promise<NullableType<User>>;
     update(userJwtPayload: JwtPayloadType, userDto: AuthUpdateDto): Promise<NullableType<User>>;
     refreshToken(data: Pick<JwtRefreshPayloadType, 'sessionId' | 'hash'>): Promise<Omit<LoginResponseDto, 'user'>>;

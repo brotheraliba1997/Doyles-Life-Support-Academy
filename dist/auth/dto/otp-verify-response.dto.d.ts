@@ -1,6 +1,9 @@
-import { User } from '../../users/domain/user';
-export declare class OtpVerifyResponseDto {
-    user: User;
+export declare class RegisterStep1ResponseDataDto {
     isUserVerified: boolean;
     isCompleteProfile: boolean;
+}
+export declare class OtpVerifyResponseDto {
+    success: boolean;
+    message: string;
+    data: RegisterStep1ResponseDataDto;
 }
