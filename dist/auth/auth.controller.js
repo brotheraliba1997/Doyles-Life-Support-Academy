@@ -129,6 +129,8 @@ __decorate([
 ], AuthController.prototype, "resendOtp", null);
 __decorate([
     (0, common_1.Post)('/register/complete'),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
+    (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOkResponse)({ type: register_response_dto_1.RegisterResponseDto }),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     __param(0, (0, common_1.Body)()),

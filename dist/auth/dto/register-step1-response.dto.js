@@ -24,17 +24,17 @@ __decorate([
     (0, swagger_1.ApiProperty)({ example: false, description: 'Profile completion status' }),
     __metadata("design:type", Boolean)
 ], RegisterStep1ResponseDataDto.prototype, "isCompleteProfile", void 0);
-class RegisterStep1ResponseDto {
-}
-exports.RegisterStep1ResponseDto = RegisterStep1ResponseDto;
 __decorate([
     (0, swagger_1.ApiProperty)({ example: '507f1f77bcf86cd799439011' }),
     __metadata("design:type", Object)
-], RegisterStep1ResponseDto.prototype, "userId", void 0);
+], RegisterStep1ResponseDataDto.prototype, "id", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ example: 'test@example.com' }),
     __metadata("design:type", String)
-], RegisterStep1ResponseDto.prototype, "userEmail", void 0);
+], RegisterStep1ResponseDataDto.prototype, "email", void 0);
+class RegisterStep1ResponseDto {
+}
+exports.RegisterStep1ResponseDto = RegisterStep1ResponseDto;
 __decorate([
     (0, swagger_1.ApiProperty)({ example: 201, description: 'Indicates whether the operation succeeded' }),
     __metadata("design:type", Object)

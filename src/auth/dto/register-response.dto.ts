@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { User } from '../../users/domain/user';
 
 class RegisterDataDto {
   @ApiProperty({ example: true, description: 'Whether the user email is verified' })
@@ -6,6 +7,12 @@ class RegisterDataDto {
 
   @ApiProperty({ example: true, description: 'Whether the user profile is complete' })
   isCompleteProfile: boolean;
+
+
+  @ApiProperty({
+    type: () => User,
+  })
+  user: User;
 }
 
 export class RegisterResponseDto {

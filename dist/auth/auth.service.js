@@ -170,7 +170,7 @@ let AuthService = class AuthService {
         const existingUser = await this.usersService.findByEmail(dto.email);
         if (existingUser) {
             throw new common_1.UnprocessableEntityException({
-                status: false,
+                success: false,
                 message: 'User already exists',
                 errors: {
                     email: 'emailAlreadyExists',
@@ -202,12 +202,12 @@ let AuthService = class AuthService {
             user.address);
         const isUserVerified = user.isEmailVerified || false;
         return {
-            userId: user.id,
-            userEmail: user.email || dto.email,
             success: true,
             data: {
                 isUserVerified,
                 isCompleteProfile,
+                id: user.id,
+                email: user.email || dto.email,
             },
             message: 'Registration completed successfully',
         };
@@ -216,7 +216,7 @@ let AuthService = class AuthService {
         const user = await this.usersService.findById(dto.userId);
         if (!user) {
             throw new common_1.UnprocessableEntityException({
-                status: false,
+                success: false,
                 message: 'User not found',
                 errors: {
                     userId: 'userNotFound',
@@ -226,7 +226,7 @@ let AuthService = class AuthService {
         const validOtp = '123456';
         if (dto.otpCode !== validOtp) {
             throw new common_1.UnprocessableEntityException({
-                status: false,
+                success: false,
                 message: 'Invalid OTP',
                 errors: {
                     otpCode: 'invalidOtp',
@@ -237,7 +237,7 @@ let AuthService = class AuthService {
         const updatedUser = await this.usersService.findById(user.id);
         if (!updatedUser) {
             throw new common_1.UnprocessableEntityException({
-                status: false,
+                success: false,
                 message: 'User not found',
             });
         }
@@ -259,13 +259,13 @@ let AuthService = class AuthService {
         const user = await this.usersService.findById(dto.userId);
         if (!user) {
             throw new common_1.UnprocessableEntityException({
-                status: false,
+                success: false,
                 message: 'User not found',
             });
         }
         if (!user.email) {
             throw new common_1.UnprocessableEntityException({
-                status: false,
+                success: false,
                 message: 'Email not found',
             });
         }
@@ -322,7 +322,7 @@ let AuthService = class AuthService {
         });
         if (!updatedUser) {
             throw new common_1.UnprocessableEntityException({
-                status: false,
+                success: false,
                 message: 'Registration failed',
             });
         }
@@ -337,6 +337,7 @@ let AuthService = class AuthService {
             data: {
                 isUserVerified: isUserVerified,
                 isCompleteProfile: isCompleteProfile,
+                user: updatedUser
             },
             message: 'Registration completed successfully',
         };
@@ -353,7 +354,7 @@ let AuthService = class AuthService {
         }
         catch {
             throw new common_1.UnprocessableEntityException({
-                status: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
+                success: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
                 errors: {
                     hash: `invalidHash`,
                 },
@@ -363,7 +364,7 @@ let AuthService = class AuthService {
         if (!user ||
             user?.status?.id?.toString() !== statuses_enum_1.StatusEnum.inactive.toString()) {
             throw new common_1.NotFoundException({
-                status: common_1.HttpStatus.NOT_FOUND,
+                success: common_1.HttpStatus.NOT_FOUND,
                 error: `notFound`,
             });
         }
@@ -459,7 +460,7 @@ let AuthService = class AuthService {
                 const currentTime = Date.now();
                 if (currentTime > expiresTimestamp) {
                     throw new common_1.UnprocessableEntityException({
-                        status: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
+                        success: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
                         errors: {
                             hash: 'expiredHash',
                         },
@@ -477,7 +478,7 @@ let AuthService = class AuthService {
         }
         catch {
             throw new common_1.UnprocessableEntityException({
-                status: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
+                success: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
                 errors: {
                     hash: 'invalidHash',
                 },
@@ -486,7 +487,7 @@ let AuthService = class AuthService {
         const user = await this.usersService.findById(userId);
         if (!user) {
             throw new common_1.UnprocessableEntityException({
-                status: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
+                success: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
                 errors: {
                     hash: 'notFound',
                 },
@@ -509,7 +510,7 @@ let AuthService = class AuthService {
         const currentUser = await this.usersService.findById(userJwtPayload.id);
         if (!currentUser) {
             throw new common_1.UnprocessableEntityException({
-                status: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
+                success: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
                 errors: {
                     user: 'userNotFound',
                 },
@@ -518,7 +519,7 @@ let AuthService = class AuthService {
         if (userDto.password) {
             if (!userDto.oldPassword) {
                 throw new common_1.UnprocessableEntityException({
-                    status: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
+                    success: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
                     errors: {
                         oldPassword: 'missingOldPassword',
                     },
@@ -526,7 +527,7 @@ let AuthService = class AuthService {
             }
             if (!currentUser.password) {
                 throw new common_1.UnprocessableEntityException({
-                    status: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
+                    success: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
                     errors: {
                         oldPassword: 'incorrectOldPassword',
                     },
@@ -535,7 +536,7 @@ let AuthService = class AuthService {
             const isValidOldPassword = await bcryptjs_1.default.compare(userDto.oldPassword, currentUser.password);
             if (!isValidOldPassword) {
                 throw new common_1.UnprocessableEntityException({
-                    status: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
+                    success: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
                     errors: {
                         oldPassword: 'incorrectOldPassword',
                     },
@@ -552,7 +553,7 @@ let AuthService = class AuthService {
             const userByEmail = await this.usersService.findByEmail(userDto.email);
             if (userByEmail && userByEmail.id !== currentUser.id) {
                 throw new common_1.UnprocessableEntityException({
-                    status: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
+                    success: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
                     errors: {
                         email: 'emailExists',
                     },

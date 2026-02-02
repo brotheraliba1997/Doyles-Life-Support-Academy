@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RegisterResponseDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
+const user_1 = require("../../users/domain/user");
 class RegisterDataDto {
 }
 __decorate([
@@ -21,6 +22,12 @@ __decorate([
     (0, swagger_1.ApiProperty)({ example: true, description: 'Whether the user profile is complete' }),
     __metadata("design:type", Boolean)
 ], RegisterDataDto.prototype, "isCompleteProfile", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        type: () => user_1.User,
+    }),
+    __metadata("design:type", user_1.User)
+], RegisterDataDto.prototype, "user", void 0);
 class RegisterResponseDto {
 }
 exports.RegisterResponseDto = RegisterResponseDto;

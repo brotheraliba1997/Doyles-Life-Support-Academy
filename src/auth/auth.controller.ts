@@ -81,9 +81,9 @@ export class AuthController {
     return this.service.resendOtp(resendOtpDto);
   }
 
-
-
   @Post('/register/complete')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
   @ApiOkResponse({ type: RegisterResponseDto })
   @HttpCode(HttpStatus.OK)
   async register(
@@ -107,6 +107,8 @@ export class AuthController {
   ): Promise<void> {
     return this.service.confirmNewEmail(confirmEmailDto.hash);
   }
+
+  
 
   @Post('forgot/password')
   @ApiOkResponse({ type: ForgotPasswordResponseDto })

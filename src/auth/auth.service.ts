@@ -430,6 +430,9 @@ export class AuthService {
       data: {
         isUserVerified: isUserVerified,
         isCompleteProfile: isCompleteProfile,
+       user: updatedUser
+      
+       
       },
       message: 'Registration completed successfully',
     };
