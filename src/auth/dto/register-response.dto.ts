@@ -21,6 +21,9 @@ class RegisterDataDto {
     type: () => User,
   })
   user: User;
+
+  @ApiProperty({ example: '123456', description: 'OTP code' })
+  otp: string;
 }
 
 export class RegisterResponseDto {

@@ -365,7 +365,10 @@ export class AuthService {
     };
   }
 
-  async register(dto: AuthRegisterLoginDto): Promise<RegisterResponseDto> {
+  async register(
+    dto: AuthRegisterLoginDto,
+    jwtPayload?: JwtPayloadType,
+  ): Promise<RegisterResponseDto> {
     const existingUser = await this.usersService.findByEmail(dto.email);
     console.log(existingUser, 'existingUser');
     if (!existingUser) {
@@ -426,22 +429,71 @@ export class AuthService {
 
     const isUserVerified = updatedUser.isEmailVerified || false;
 
-    const hash = crypto
-      .createHash('sha256')
-      .update(randomStringGenerator())
-      .digest('hex');
+    let token: string;
+    let refreshToken: string;
+    let tokenExpires: number;
 
-    const session = await this.sessionService.create({
-      user: updatedUser,
-      hash,
-    });
-
-    const { token, refreshToken, tokenExpires } = await this.getTokensData({
-      id: updatedUser.id,
-      role: updatedUser.role,
-      sessionId: session.id,
-      hash,
-    });
+    if (jwtPayload?.sessionId) {
+      const existingSession = await this.sessionService.findById(
+        jwtPayload.sessionId,
+      );
+      if (
+        existingSession &&
+        existingSession.user?.id === updatedUser.id
+      ) {
+        const hash = crypto
+          .createHash('sha256')
+          .update(randomStringGenerator())
+          .digest('hex');
+        await this.sessionService.update(existingSession.id, { hash });
+        const tokens = await this.getTokensData({
+          id: updatedUser.id,
+          role: updatedUser.role,
+          sessionId: existingSession.id,
+          hash,
+        });
+        token = tokens.token;
+        refreshToken = tokens.refreshToken;
+        tokenExpires = tokens.tokenExpires;
+      } else {
+        const hash = crypto
+          .createHash('sha256')
+          .update(randomStringGenerator())
+          .digest('hex');
+        const session = await this.sessionService.create({
+          user: updatedUser,
+          hash,
+        });
+        const tokens = await this.getTokensData({
+          id: updatedUser.id,
+          role: updatedUser.role,
+          sessionId: session.id,
+          hash,
+        });
+        token = tokens.token;
+        refreshToken = tokens.refreshToken;
+        tokenExpires = tokens.tokenExpires;
+      }
+    } else {
+      const hash = crypto
+        .createHash('sha256')
+        .update(randomStringGenerator())
+        .digest('hex');
+      const session = await this.sessionService.create({
+        user: updatedUser,
+        hash,
+      });
+      const tokens = await this.getTokensData({
+        id: updatedUser.id,
+        role: updatedUser.role,
+        sessionId: session.id,
+        hash,
+      });
+      token = tokens.token;
+      refreshToken = tokens.refreshToken;
+      tokenExpires = tokens.tokenExpires;
+    }
+      const otpCode = "1234"
 
     return {
       success: true,
@@ -452,6 +504,7 @@ export class AuthService {
         isUserVerified,
         isCompleteProfile,
         user: updatedUser,
+        otp: otpCode,
       },
       message: 'Registration completed successfully',
     };

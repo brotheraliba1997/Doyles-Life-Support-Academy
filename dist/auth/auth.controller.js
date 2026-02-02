@@ -51,8 +51,8 @@ let AuthController = class AuthController {
     async resendOtp(resendOtpDto) {
         return this.service.resendOtp(resendOtpDto);
     }
-    async register(createUserDto) {
-        return this.service.register(createUserDto);
+    async register(createUserDto, req) {
+        return this.service.register(createUserDto, req.user);
     }
     async confirmEmail(confirmEmailDto) {
         return this.service.confirmEmail(confirmEmailDto.hash);
@@ -134,8 +134,9 @@ __decorate([
     (0, swagger_1.ApiOkResponse)({ type: register_response_dto_1.RegisterResponseDto }),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [auth_register_login_dto_1.AuthRegisterLoginDto]),
+    __metadata("design:paramtypes", [auth_register_login_dto_1.AuthRegisterLoginDto, Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "register", null);
 __decorate([

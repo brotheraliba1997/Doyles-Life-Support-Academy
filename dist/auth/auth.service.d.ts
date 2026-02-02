@@ -34,7 +34,7 @@ export declare class AuthService {
     registerStep1(dto: AuthRegisterStep1Dto): Promise<RegisterStep1ResponseDto>;
     OTPVerify(dto: AuthOtpVerifyDto): Promise<OtpVerifyResponseDto>;
     resendOtp(dto: AuthResendOtpDto): Promise<ResendOtpResponseDto>;
-    register(dto: AuthRegisterLoginDto): Promise<RegisterResponseDto>;
+    register(dto: AuthRegisterLoginDto, jwtPayload?: JwtPayloadType): Promise<RegisterResponseDto>;
     confirmEmail(hash: string): Promise<void>;
     confirmNewEmail(hash: string): Promise<void>;
     forgotPassword(email: string): Promise<ForgotPasswordResponseDto>;

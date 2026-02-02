@@ -40,6 +40,10 @@ __decorate([
     }),
     __metadata("design:type", user_1.User)
 ], RegisterDataDto.prototype, "user", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: '123456', description: 'OTP code' }),
+    __metadata("design:type", String)
+], RegisterDataDto.prototype, "otp", void 0);
 class RegisterResponseDto {
 }
 exports.RegisterResponseDto = RegisterResponseDto;

@@ -33,6 +33,7 @@ import { OtpVerifyResponseDto } from './dto/otp-verify-response.dto';
 import { RegisterResponseDto } from './dto/register-response.dto';
 import { ForgotPasswordResponseDto } from './dto/forgot-password-response.dto';
 import { ResetPasswordResponseDto } from './dto/reset-password-response.dto';
+import { JwtPayloadType } from './strategies/types/jwt-payload.type';
 
 @ApiTags('Auth')
 @Controller({
@@ -88,8 +89,9 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async register(
     @Body() createUserDto: AuthRegisterLoginDto,
+    @Request() req: { user: JwtPayloadType },
   ): Promise<RegisterResponseDto> {
-    return this.service.register(createUserDto);
+    return this.service.register(createUserDto, req.user);
   }
 
   @Post('email/confirm')

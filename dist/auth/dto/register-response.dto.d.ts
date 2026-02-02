@@ -6,6 +6,7 @@ declare class RegisterDataDto {
     isUserVerified: boolean;
     isCompleteProfile: boolean;
     user: User;
+    otp: string;
 }
 export declare class RegisterResponseDto {
     success: boolean;
