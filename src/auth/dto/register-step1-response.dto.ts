@@ -14,11 +14,11 @@ export class RegisterStep1ResponseDataDto {
 
 
   @ApiProperty({ example: '507f1f77bcf86cd799439011' })
-  userId: string | number;
+  id: string | number;
 
   @ApiProperty({ example: 'test@example.com' })
-  userEmail: string;
-  
+  email: string;
+
 }
 
 export class RegisterStep1ResponseDto {

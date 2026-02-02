@@ -261,8 +261,8 @@ export class AuthService {
       data: {
         isUserVerified,
         isCompleteProfile,
-         userId: user.id,
-      userEmail: user.email || dto.email, 
+         id: user.id,
+      email: user.email || dto.email, 
       },
       message: 'Registration completed successfully',
      
