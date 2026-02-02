@@ -33,7 +33,7 @@
     "seed:run:document": "ts-node -r tsconfig-paths/register ./src/database/seeds/document/run-seed.ts",
     "seed:courses": "ts-node -r tsconfig-paths/register ./src/database/seeds/seed-courses.ts",
     "prebuild": "rimraf dist",
-    "build": "nest build",
+    "build": "nest build && node -e \"require('fs').cpSync(require('path').join('src','i18n'), 'i18n', {recursive: true})\"",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
