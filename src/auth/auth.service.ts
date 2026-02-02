@@ -256,12 +256,13 @@ export class AuthService {
 
     const isUserVerified = user.isEmailVerified || false;
     return {
-      userId: user.id,
-      userEmail: user.email || dto.email, 
+     
       success: true,
       data: {
         isUserVerified,
         isCompleteProfile,
+         userId: user.id,
+      userEmail: user.email || dto.email, 
       },
       message: 'Registration completed successfully',
      
