@@ -23,7 +23,6 @@ const facebook_config_1 = __importDefault(require("./auth-facebook/config/facebo
 const google_config_1 = __importDefault(require("./auth-google/config/google.config"));
 const apple_config_1 = __importDefault(require("./auth-apple/config/apple.config"));
 const path_1 = __importDefault(require("path"));
-const fs_1 = __importDefault(require("fs"));
 const config_1 = require("@nestjs/config");
 const typeorm_1 = require("@nestjs/typeorm");
 const auth_apple_module_1 = require("./auth-apple/auth-apple.module");
@@ -55,7 +54,6 @@ const location_module_1 = require("./location/location.module");
 const notification_module_1 = require("./notification/notification.module");
 const enquiries_module_1 = require("./enquiry/enquiries.module");
 const assigment_module_1 = require("./assigment/assigment.module");
-const student_item_grade_module_1 = require("./student-item-Grade/student-item-grade.module");
 const infrastructureDatabaseModule = (0, database_config_1.default)()
     .isDocumentDatabase
     ? mongoose_1.MongooseModule.forRootAsync({
@@ -90,24 +88,12 @@ exports.AppModule = AppModule = __decorate([
             }),
             infrastructureDatabaseModule,
             nestjs_i18n_1.I18nModule.forRootAsync({
-                useFactory: (configService) => {
-                    const workingDirectory = configService.getOrThrow('app.workingDirectory', {
+                useFactory: (configService) => ({
+                    fallbackLanguage: configService.getOrThrow('app.fallbackLanguage', {
                         infer: true,
-                    });
-                    const candidates = [
-                        path_1.default.join(workingDirectory, 'dist', 'i18n'),
-                        path_1.default.join(workingDirectory, 'i18n'),
-                        path_1.default.join(workingDirectory, 'src', 'i18n'),
-                    ];
-                    const i18nPath = candidates.find((p) => fs_1.default.existsSync(p)) ?? candidates[2];
-                    const isDev = process.env.NODE_ENV !== 'production';
-                    return {
-                        fallbackLanguage: configService.getOrThrow('app.fallbackLanguage', {
-                            infer: true,
-                        }),
-                        loaderOptions: { path: i18nPath, watch: isDev },
-                    };
-                },
+                    }),
+                    loaderOptions: { path: path_1.default.join(__dirname, '/i18n/'), watch: true },
+                }),
                 resolvers: [
                     {
                         use: nestjs_i18n_1.HeaderResolver,
@@ -150,7 +136,6 @@ exports.AppModule = AppModule = __decorate([
             notification_module_1.NotificationModule,
             enquiries_module_1.EnquiriesModule,
             assigment_module_1.AssigmentModule,
-            student_item_grade_module_1.StudentItemGradeModule
         ],
     })
 ], AppModule);

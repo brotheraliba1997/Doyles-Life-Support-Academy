@@ -11,7 +11,6 @@ import facebookConfig from './auth-facebook/config/facebook.config';
 import googleConfig from './auth-google/config/google.config';
 import appleConfig from './auth-apple/config/apple.config';
 import path from 'path';
-import fs from 'fs';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthAppleModule } from './auth-apple/auth-apple.module';
@@ -45,7 +44,10 @@ import { LocationModule } from './location/location.module';
 import { NotificationModule } from './notification/notification.module';
 import { EnquiriesModule } from './enquiry/enquiries.module';
 import { AssigmentModule } from './assigment/assigment.module';
+
 import { StudentItemGradeModule } from './student-item-Grade/student-item-grade.module';
+
+
 
 // <database-block>
 const infrastructureDatabaseModule = (databaseConfig() as DatabaseConfig)
@@ -80,27 +82,12 @@ const infrastructureDatabaseModule = (databaseConfig() as DatabaseConfig)
     }),
     infrastructureDatabaseModule,
     I18nModule.forRootAsync({
-      useFactory: (configService: ConfigService<AllConfigType>) => {
-        const workingDirectory = configService.getOrThrow('app.workingDirectory', {
+      useFactory: (configService: ConfigService<AllConfigType>) => ({
+        fallbackLanguage: configService.getOrThrow('app.fallbackLanguage', {
           infer: true,
-        });
-        // Check multiple locations: dist/i18n (prod build), i18n (Vercel/serverless root), src/i18n (dev)
-        const candidates = [
-          path.join(workingDirectory, 'dist', 'i18n'),
-          path.join(workingDirectory, 'i18n'),
-          path.join(workingDirectory, 'src', 'i18n'),
-        ];
-        const i18nPath =
-          candidates.find((p) => fs.existsSync(p)) ?? candidates[2];
-        const isDev = process.env.NODE_ENV !== 'production';
-
-        return {
-          fallbackLanguage: configService.getOrThrow('app.fallbackLanguage', {
-            infer: true,
-          }),
-          loaderOptions: { path: i18nPath, watch: isDev },
-        };
-      },
+        }),
+        loaderOptions: { path: path.join(__dirname, '/i18n/'), watch: true },
+      }),
       resolvers: [
         {
           use: HeaderResolver,
@@ -144,7 +131,6 @@ const infrastructureDatabaseModule = (databaseConfig() as DatabaseConfig)
     EnquiriesModule,
     AssigmentModule,
   
-    StudentItemGradeModule
   ],
 })
 export class AppModule {}
