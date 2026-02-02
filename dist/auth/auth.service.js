@@ -339,8 +339,7 @@ let AuthService = class AuthService {
         let tokenExpires;
         if (jwtPayload?.sessionId) {
             const existingSession = await this.sessionService.findById(jwtPayload.sessionId);
-            if (existingSession &&
-                existingSession.user?.id === updatedUser.id) {
+            if (existingSession && existingSession.user?.id === updatedUser.id) {
                 const hash = crypto_1.default
                     .createHash('sha256')
                     .update((0, random_string_generator_util_1.randomStringGenerator)())

@@ -6,8 +6,10 @@
 
 ## Apache Benchmark
 
+Install Apache Bench (`ab`) locally, then run:
+
 ```bash
-docker run --rm jordi/ab -n 100 -c 100 -T application/json -H "Authorization: Bearer USER_TOKEN" -v 2 http://<server_ip>:3000/api/v1/users
+ab -n 100 -c 100 -T application/json -H "Authorization: Bearer USER_TOKEN" -v 2 http://<server_ip>:3000/api/v1/users
 ```
 
 ---

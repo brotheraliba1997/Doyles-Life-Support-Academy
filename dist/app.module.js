@@ -37,23 +37,13 @@ const session_module_1 = require("./session/session.module");
 const mailer_module_1 = require("./mailer/mailer.module");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_config_service_1 = require("./database/mongoose-config.service");
-const certificates_module_1 = require("./certificate/certificates.module");
-const courses_module_1 = require("./course/courses.module");
-const categories_module_1 = require("./category/categories.module");
 const blogs_module_1 = require("./blog/blogs.module");
-const class_schedule_module_1 = require("./classSchedule/class-schedule.module");
-const enrollment_module_1 = require("./Enrollment/enrollment.module");
 const stripe_module_1 = require("./stripe/stripe.module");
 const stripe_config_1 = __importDefault(require("./stripe/config/stripe.config"));
-const payment_module_1 = require("./payment/payment.module");
 const google_module_1 = require("./googleService/google.module");
-const booking_module_1 = require("./booking/booking.module");
-const purchase_module_1 = require("./purchaseOrder/purchase.module");
-const attendence_module_1 = require("./attendance/attendence.module");
 const location_module_1 = require("./location/location.module");
 const notification_module_1 = require("./notification/notification.module");
 const enquiries_module_1 = require("./enquiry/enquiries.module");
-const assigment_module_1 = require("./assigment/assigment.module");
 const infrastructureDatabaseModule = (0, database_config_1.default)()
     .isDocumentDatabase
     ? mongoose_1.MongooseModule.forRootAsync({
@@ -120,22 +110,12 @@ exports.AppModule = AppModule = __decorate([
             mail_module_1.MailModule,
             mailer_module_1.MailerModule,
             home_module_1.HomeModule,
-            certificates_module_1.CertificatesModule,
-            courses_module_1.CoursesModule,
-            categories_module_1.CategoriesModule,
-            enrollment_module_1.EnrollmentModule,
             blogs_module_1.BlogsModule,
-            class_schedule_module_1.ClassScheduleModule,
             google_module_1.GoogleModule,
             stripe_module_1.StripeModule,
-            payment_module_1.PaymentModule,
-            booking_module_1.BookingsModule,
-            purchase_module_1.PurchaseOrderModule,
-            attendence_module_1.AttendanceModule,
             location_module_1.LocationModule,
             notification_module_1.NotificationModule,
             enquiries_module_1.EnquiriesModule,
-            assigment_module_1.AssigmentModule,
         ],
     })
 ], AppModule);

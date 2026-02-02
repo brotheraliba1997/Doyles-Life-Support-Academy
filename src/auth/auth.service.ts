@@ -437,10 +437,7 @@ export class AuthService {
       const existingSession = await this.sessionService.findById(
         jwtPayload.sessionId,
       );
-      if (
-        existingSession &&
-        existingSession.user?.id === updatedUser.id
-      ) {
+      if (existingSession && existingSession.user?.id === updatedUser.id) {
         const hash = crypto
           .createHash('sha256')
           .update(randomStringGenerator())

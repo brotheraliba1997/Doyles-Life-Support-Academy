@@ -32,15 +32,7 @@ Switching between TypeORM and Mongoose is implemented based on the [Hexagonal Ar
    cp env-example-relational .env
    ```
 
-1. Change `DATABASE_HOST=postgres` to `DATABASE_HOST=localhost`
-
-   Change `MAIL_HOST=maildev` to `MAIL_HOST=localhost`
-
-1. Run additional container:
-
-   ```bash
-   docker compose up -d postgres adminer maildev
-   ```
+1. Set `DATABASE_HOST=localhost` and `MAIL_HOST=localhost` in `.env`. Ensure PostgreSQL and Maildev (or your preferred mail catcher) are running locally.
 
 1. Install dependency
 
@@ -99,13 +91,7 @@ Switching between TypeORM and Mongoose is implemented based on the [Hexagonal Ar
    cp env-example-document .env
    ```
 
-1. Change `DATABASE_URL=mongodb://mongo:27017` to `DATABASE_URL=mongodb://localhost:27017`
-
-1. Run additional container:
-
-   ```bash
-   docker compose -f docker-compose.document.yaml up -d mongo mongo-express maildev
-   ```
+1. Set `DATABASE_URL=mongodb://localhost:27017` in `.env`. Ensure MongoDB and Maildev (or your preferred mail catcher) are running locally.
 
 1. Install dependency
 
@@ -141,67 +127,13 @@ Switching between TypeORM and Mongoose is implemented based on the [Hexagonal Ar
 
 ## Quick run (PostgreSQL + TypeORM)
 
-If you want quick run your app, you can use following commands:
-
-1. Clone repository
-
-   ```bash
-   git clone --depth 1 https://github.com/brocoders/nestjs-boilerplate.git my-app
-   ```
-
-1. Go to folder, and copy `env-example-relational` as `.env`.
-
-   ```bash
-   cd my-app/
-   cp env-example-relational .env
-   ```
-
-1. Run containers
-
-   ```bash
-   docker compose up -d
-   ```
-
-1. For check status run
-
-   ```bash
-   docker compose logs
-   ```
-
-1. Open <http://localhost:3000>
+Follow [Comfortable development (PostgreSQL + TypeORM)](#comfortable-development-postgresql--typeorm) with PostgreSQL and Maildev running locally.
 
 ---
 
 ## Quick run (MongoDB + Mongoose)
 
-If you want quick run your app, you can use following commands:
-
-1. Clone repository
-
-   ```bash
-   git clone --depth 1 https://github.com/brocoders/nestjs-boilerplate.git my-app
-   ```
-
-1. Go to folder, and copy `env-example-document` as `.env`.
-
-   ```bash
-   cd my-app/
-   cp env-example-document .env
-   ```
-
-1. Run containers
-
-   ```bash
-   docker compose -f docker-compose.document.yaml up -d
-   ```
-
-1. For check status run
-
-   ```bash
-   docker compose -f docker-compose.document.yaml logs
-   ```
-
-1. Open <http://localhost:3000>
+Follow [Comfortable development (MongoDB + Mongoose)](#comfortable-development-mongodb--mongoose) with MongoDB and Maildev running locally.
 
 ---
 
