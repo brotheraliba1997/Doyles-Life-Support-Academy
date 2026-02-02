@@ -94,14 +94,18 @@ exports.AppModule = AppModule = __decorate([
                     const workingDirectory = configService.getOrThrow('app.workingDirectory', {
                         infer: true,
                     });
-                    const distI18nPath = path_1.default.join(workingDirectory, 'dist', 'i18n');
-                    const srcI18nPath = path_1.default.join(workingDirectory, 'src', 'i18n');
-                    const i18nPath = fs_1.default.existsSync(distI18nPath) ? distI18nPath : srcI18nPath;
+                    const candidates = [
+                        path_1.default.join(workingDirectory, 'dist', 'i18n'),
+                        path_1.default.join(workingDirectory, 'i18n'),
+                        path_1.default.join(workingDirectory, 'src', 'i18n'),
+                    ];
+                    const i18nPath = candidates.find((p) => fs_1.default.existsSync(p)) ?? candidates[2];
+                    const isDev = process.env.NODE_ENV !== 'production';
                     return {
                         fallbackLanguage: configService.getOrThrow('app.fallbackLanguage', {
                             infer: true,
                         }),
-                        loaderOptions: { path: i18nPath, watch: true },
+                        loaderOptions: { path: i18nPath, watch: isDev },
                     };
                 },
                 resolvers: [
