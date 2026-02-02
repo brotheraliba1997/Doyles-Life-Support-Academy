@@ -1,0 +1,99 @@
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.AssigmentSchema = exports.AssignmentSchemaClass = void 0;
+const mongoose_1 = require("@nestjs/mongoose");
+const mongoose_2 = require("mongoose");
+const document_entity_helper_1 = require("../../utils/document-entity-helper");
+const course_schema_1 = require("../../course/schema/course.schema");
+const user_schema_1 = require("../../users/schema/user.schema");
+const class_schedule_schema_1 = require("../../classSchedule/schema/class-schedule.schema");
+let AssignmentSchemaClass = class AssignmentSchemaClass extends document_entity_helper_1.EntityDocumentHelper {
+};
+exports.AssignmentSchemaClass = AssignmentSchemaClass;
+__decorate([
+    (0, mongoose_1.Prop)({
+        type: mongoose_2.Types.ObjectId,
+        ref: class_schedule_schema_1.ClassScheduleSchemaClass.name,
+        required: true,
+        index: true,
+        description: 'Class Schedule ID reference',
+    }),
+    __metadata("design:type", mongoose_2.Types.ObjectId)
+], AssignmentSchemaClass.prototype, "classScheduleId", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({
+        type: mongoose_2.Types.ObjectId,
+        ref: course_schema_1.CourseSchemaClass.name,
+        required: true,
+        index: true,
+        description: 'Course ID reference',
+    }),
+    __metadata("design:type", mongoose_2.Types.ObjectId)
+], AssignmentSchemaClass.prototype, "courseId", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({
+        type: mongoose_2.Types.ObjectId,
+        required: true,
+        description: 'Session ID from course.sessions array (ObjectId)',
+        index: true,
+    }),
+    __metadata("design:type", mongoose_2.Types.ObjectId)
+], AssignmentSchemaClass.prototype, "sessionId", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({
+        type: mongoose_2.Types.ObjectId,
+        ref: user_schema_1.UserSchemaClass.name,
+        required: true,
+        index: true,
+    }),
+    __metadata("design:type", mongoose_2.Types.ObjectId)
+], AssignmentSchemaClass.prototype, "student", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({
+        type: mongoose_2.Types.ObjectId,
+        ref: user_schema_1.UserSchemaClass.name,
+        required: true,
+        description: 'Instructor who evaluated the assignment',
+    }),
+    __metadata("design:type", mongoose_2.Types.ObjectId)
+], AssignmentSchemaClass.prototype, "markedBy", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({
+        type: Number,
+        index: true,
+        required: true,
+        description: 'Marks awarded for the assignment',
+    }),
+    __metadata("design:type", Number)
+], AssignmentSchemaClass.prototype, "marks", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({
+        type: String,
+        trim: true,
+        description: 'Certificate PDF URL',
+    }),
+    __metadata("design:type", String)
+], AssignmentSchemaClass.prototype, "certificateUrl", void 0);
+exports.AssignmentSchemaClass = AssignmentSchemaClass = __decorate([
+    (0, mongoose_1.Schema)({
+        timestamps: true,
+        toJSON: { virtuals: true, getters: true },
+    })
+], AssignmentSchemaClass);
+exports.AssigmentSchema = mongoose_1.SchemaFactory.createForClass(AssignmentSchemaClass);
+exports.AssigmentSchema.index({ classScheduleId: 1, student: 1 });
+exports.AssigmentSchema.index({ classScheduleId: 1 });
+exports.AssigmentSchema.index({ courseId: 1 });
+exports.AssigmentSchema.index({ student: 1 });
+exports.AssigmentSchema.index({ markedBy: 1 });
+exports.AssigmentSchema.index({ marks: 1 });
+//# sourceMappingURL=assigment.schema.js.map
