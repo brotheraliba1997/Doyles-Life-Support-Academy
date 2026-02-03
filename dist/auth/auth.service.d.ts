@@ -4,7 +4,7 @@ import { AuthUpdateDto } from './dto/auth-update.dto';
 import { SocialInterface } from '../social/interfaces/social.interface';
 import { AuthRegisterLoginDto } from './dto/auth-register-login.dto';
 import { NullableType } from '../utils/types/nullable.type';
-import { LoginResponseDto } from './dto/login-response.dto';
+import { LoginResponseDto, LoginResponseSuccessDto } from './dto/login-response.dto';
 import { ConfigService } from '@nestjs/config';
 import { JwtRefreshPayloadType } from './strategies/types/jwt-refresh-payload.type';
 import { JwtPayloadType } from './strategies/types/jwt-payload.type';
@@ -29,7 +29,7 @@ export declare class AuthService {
     private mailService;
     private configService;
     constructor(jwtService: JwtService, usersService: UsersService, sessionService: SessionService, mailService: MailService, configService: ConfigService<AllConfigType>);
-    validateLogin(loginDto: AuthEmailLoginDto): Promise<LoginResponseDto>;
+    validateLogin(loginDto: AuthEmailLoginDto): Promise<LoginResponseSuccessDto>;
     validateSocialLogin(authProvider: string, socialData: SocialInterface): Promise<LoginResponseDto>;
     registerStep1(dto: AuthRegisterStep1Dto): Promise<RegisterStep1ResponseDto>;
     OTPVerify(dto: AuthOtpVerifyDto): Promise<OtpVerifyResponseDto>;

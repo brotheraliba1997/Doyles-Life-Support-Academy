@@ -16,7 +16,7 @@ import { AuthProvidersEnum } from './auth-providers.enum';
 import { SocialInterface } from '../social/interfaces/social.interface';
 import { AuthRegisterLoginDto } from './dto/auth-register-login.dto';
 import { NullableType } from '../utils/types/nullable.type';
-import { LoginResponseDto } from './dto/login-response.dto';
+import { LoginResponseDto, LoginResponseSuccessDto } from './dto/login-response.dto';
 import { ConfigService } from '@nestjs/config';
 import { JwtRefreshPayloadType } from './strategies/types/jwt-refresh-payload.type';
 import { JwtPayloadType } from './strategies/types/jwt-payload.type';
@@ -48,7 +48,7 @@ export class AuthService {
     private configService: ConfigService<AllConfigType>,
   ) {}
 
-  async validateLogin(loginDto: AuthEmailLoginDto): Promise<LoginResponseDto> {
+  async validateLogin(loginDto: AuthEmailLoginDto): Promise<LoginResponseSuccessDto> {
     const user = await this.usersService.findByEmail(loginDto.email);
 
     if (!user) {
@@ -110,11 +110,17 @@ export class AuthService {
     });
 
     return {
-      refreshToken,
-      token,
-      tokenExpires,
-      user,
+
+      success: true,
+      message: 'Login successful',
+      data: {
+        user,
+        token,
+        refreshToken,
+        tokenExpires,
+      },
     };
+   
   }
 
   async validateSocialLogin(

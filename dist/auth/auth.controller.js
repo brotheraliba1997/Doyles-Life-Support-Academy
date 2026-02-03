@@ -93,7 +93,7 @@ __decorate([
         groups: ['me'],
     }),
     (0, common_1.Post)('email/login'),
-    (0, swagger_1.ApiOkResponse)({ type: login_response_dto_1.LoginResponseDto }),
+    (0, swagger_1.ApiOkResponse)({ type: login_response_dto_1.LoginResponseSuccessDto }),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),

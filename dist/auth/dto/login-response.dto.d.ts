@@ -5,3 +5,8 @@ export declare class LoginResponseDto {
     tokenExpires: number;
     user: User;
 }
+export declare class LoginResponseSuccessDto {
+    success: boolean;
+    message: string;
+    data: LoginResponseDto;
+}

@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.LoginResponseDto = void 0;
+exports.LoginResponseSuccessDto = exports.LoginResponseDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const user_1 = require("../../users/domain/user");
 class LoginResponseDto {
@@ -33,4 +33,19 @@ __decorate([
     }),
     __metadata("design:type", user_1.User)
 ], LoginResponseDto.prototype, "user", void 0);
+class LoginResponseSuccessDto {
+}
+exports.LoginResponseSuccessDto = LoginResponseSuccessDto;
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    __metadata("design:type", Boolean)
+], LoginResponseSuccessDto.prototype, "success", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    __metadata("design:type", String)
+], LoginResponseSuccessDto.prototype, "message", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    __metadata("design:type", LoginResponseDto)
+], LoginResponseSuccessDto.prototype, "data", void 0);
 //# sourceMappingURL=login-response.dto.js.map

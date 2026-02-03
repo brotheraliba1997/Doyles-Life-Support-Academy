@@ -5,7 +5,7 @@ import { AuthConfirmEmailDto } from './dto/auth-confirm-email.dto';
 import { AuthResetPasswordDto } from './dto/auth-reset-password.dto';
 import { AuthUpdateDto } from './dto/auth-update.dto';
 import { AuthRegisterLoginDto } from './dto/auth-register-login.dto';
-import { LoginResponseDto } from './dto/login-response.dto';
+import { LoginResponseSuccessDto } from './dto/login-response.dto';
 import { NullableType } from '../utils/types/nullable.type';
 import { User } from '../users/domain/user';
 import { RefreshResponseDto } from './dto/refresh-response.dto';
@@ -22,7 +22,7 @@ import { JwtPayloadType } from './strategies/types/jwt-payload.type';
 export declare class AuthController {
     private readonly service;
     constructor(service: AuthService);
-    login(loginDto: AuthEmailLoginDto): Promise<LoginResponseDto>;
+    login(loginDto: AuthEmailLoginDto): Promise<LoginResponseSuccessDto>;
     registerStep1(createUserDto: AuthRegisterStep1Dto): Promise<RegisterStep1ResponseDto>;
     OTPVerify(otpVerifyDto: AuthOtpVerifyDto): Promise<OtpVerifyResponseDto>;
     resendOtp(resendOtpDto: AuthResendOtpDto): Promise<ResendOtpResponseDto>;

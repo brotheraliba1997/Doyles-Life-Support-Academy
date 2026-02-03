@@ -20,7 +20,7 @@ import { AuthResetPasswordDto } from './dto/auth-reset-password.dto';
 import { AuthUpdateDto } from './dto/auth-update.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthRegisterLoginDto } from './dto/auth-register-login.dto';
-import { LoginResponseDto } from './dto/login-response.dto';
+import { LoginResponseDto, LoginResponseSuccessDto } from './dto/login-response.dto';
 import { NullableType } from '../utils/types/nullable.type';
 import { User } from '../users/domain/user';
 import { RefreshResponseDto } from './dto/refresh-response.dto';
@@ -47,9 +47,9 @@ export class AuthController {
     groups: ['me'],
   })
   @Post('email/login')
-  @ApiOkResponse({ type: LoginResponseDto })
+  @ApiOkResponse({ type: LoginResponseSuccessDto })
   @HttpCode(HttpStatus.OK)
-  public login(@Body() loginDto: AuthEmailLoginDto): Promise<LoginResponseDto> {
+  public login(@Body() loginDto: AuthEmailLoginDto): Promise<LoginResponseSuccessDto> {
     return this.service.validateLogin(loginDto);
   }
 

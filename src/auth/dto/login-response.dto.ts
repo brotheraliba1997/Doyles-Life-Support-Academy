@@ -1,6 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { User } from '../../users/domain/user';
 
+
+
+
 export class LoginResponseDto {
   @ApiProperty()
   token: string;
@@ -15,4 +18,16 @@ export class LoginResponseDto {
     type: () => User,
   })
   user: User;
+}
+
+
+export class LoginResponseSuccessDto {
+  @ApiProperty()
+  success: boolean;
+
+  @ApiProperty()
+  message: string;
+
+  @ApiProperty()
+  data: LoginResponseDto;
 }

@@ -84,10 +84,14 @@ let AuthService = class AuthService {
             hash,
         });
         return {
-            refreshToken,
-            token,
-            tokenExpires,
-            user,
+            success: true,
+            message: 'Login successful',
+            data: {
+                user,
+                token,
+                refreshToken,
+                tokenExpires,
+            },
         };
     }
     async validateSocialLogin(authProvider, socialData) {
