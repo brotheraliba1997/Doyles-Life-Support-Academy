@@ -12,6 +12,7 @@ export declare class MailService {
     forgotPassword(mailData: MailData<{
         hash: string;
         tokenExpires: number;
+        otp: string;
     }>): Promise<void>;
     confirmNewEmail(mailData: MailData<{
         hash: string;

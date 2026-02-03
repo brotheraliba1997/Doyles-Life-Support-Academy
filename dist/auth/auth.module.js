@@ -18,6 +18,8 @@ const jwt_refresh_strategy_1 = require("./strategies/jwt-refresh.strategy");
 const mail_module_1 = require("../mail/mail.module");
 const session_module_1 = require("../session/session.module");
 const users_module_1 = require("../users/users.module");
+const mongoose_1 = require("@nestjs/mongoose");
+const otp_schema_1 = require("../users/schema/otp.schema");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
@@ -29,6 +31,9 @@ exports.AuthModule = AuthModule = __decorate([
             passport_1.PassportModule,
             mail_module_1.MailModule,
             jwt_1.JwtModule.register({}),
+            mongoose_1.MongooseModule.forFeature([
+                { name: otp_schema_1.OtpSchemaClass.name, schema: otp_schema_1.OtpSchema },
+            ]),
         ],
         controllers: [auth_controller_1.AuthController],
         providers: [auth_service_1.AuthService, jwt_strategy_1.JwtStrategy, jwt_refresh_strategy_1.JwtRefreshStrategy, anonymous_strategy_1.AnonymousStrategy],

@@ -13,6 +13,7 @@ const users_controller_1 = require("./users.controller");
 const users_service_1 = require("./users.service");
 const files_module_1 = require("../files/files.module");
 const user_schema_1 = require("./schema/user.schema");
+const otp_schema_1 = require("./schema/otp.schema");
 let UsersModule = class UsersModule {
 };
 exports.UsersModule = UsersModule;
@@ -21,6 +22,7 @@ exports.UsersModule = UsersModule = __decorate([
         imports: [
             mongoose_1.MongooseModule.forFeature([
                 { name: user_schema_1.UserSchemaClass.name, schema: user_schema_1.UserSchema },
+                { name: otp_schema_1.OtpSchemaClass.name, schema: otp_schema_1.OtpSchema },
             ]),
             files_module_1.FilesModule,
         ],

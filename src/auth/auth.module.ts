@@ -9,6 +9,8 @@ import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 import { MailModule } from '../mail/mail.module';
 import { SessionModule } from '../session/session.module';
 import { UsersModule } from '../users/users.module';
+import { MongooseModule } from '@nestjs/mongoose';
+import { OtpSchema, OtpSchemaClass } from '../users/schema/otp.schema';
 
 @Module({
   imports: [
@@ -17,6 +19,9 @@ import { UsersModule } from '../users/users.module';
     PassportModule,
     MailModule,
     JwtModule.register({}),
+    MongooseModule.forFeature([
+      { name: OtpSchemaClass.name, schema: OtpSchema },
+    ]),
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, JwtRefreshStrategy, AnonymousStrategy],

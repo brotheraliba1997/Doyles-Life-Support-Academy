@@ -39,7 +39,7 @@ let MailController = class MailController {
                 case 'reset-password':
                     await this.mailService.forgotPassword({
                         to,
-                        data: { hash: 'test-hash-789', tokenExpires: Date.now() + 3600000 },
+                        data: { hash: 'test-hash-789', tokenExpires: Date.now() + 3600000, otp: '1234' },
                     });
                     break;
                 case 'lesson-scheduled':

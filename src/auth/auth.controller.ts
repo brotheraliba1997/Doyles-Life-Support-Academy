@@ -33,6 +33,8 @@ import { OtpVerifyResponseDto } from './dto/otp-verify-response.dto';
 import { RegisterResponseDto } from './dto/register-response.dto';
 import { ForgotPasswordResponseDto } from './dto/forgot-password-response.dto';
 import { ResetPasswordResponseDto } from './dto/reset-password-response.dto';
+import { AuthForgotPasswordOtpVerifyDto } from './dto/auth-forgot-password-otp-verify.dto';
+import { ForgotPasswordOtpVerifyResponseDto } from './dto/forgot-password-otp-verify-response.dto';
 import { JwtPayloadType } from './strategies/types/jwt-payload.type';
 
 @ApiTags('Auth')
@@ -122,12 +124,21 @@ export class AuthController {
     return this.service.forgotPassword(forgotPasswordDto.email);
   }
 
+  @Post('forgot/password/verify-otp')
+  @ApiOkResponse({ type: ForgotPasswordOtpVerifyResponseDto })
+  @HttpCode(HttpStatus.OK)
+  async verifyForgotPasswordOtp(
+    @Body() verifyOtpDto: AuthForgotPasswordOtpVerifyDto,
+  ): Promise<ForgotPasswordOtpVerifyResponseDto> {
+    return this.service.verifyForgotPasswordOtp(verifyOtpDto);
+  }
+
   @Post('reset/password')
   @ApiOkResponse({ type: ResetPasswordResponseDto })
   @HttpCode(HttpStatus.OK)
   resetPassword(@Body() resetPasswordDto: AuthResetPasswordDto): Promise<ResetPasswordResponseDto> {
     return this.service.resetPassword(
-      resetPasswordDto.hash,
+      resetPasswordDto.resetToken,
       resetPasswordDto.password,
     );
   }

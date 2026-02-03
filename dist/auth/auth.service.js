@@ -8,6 +8,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -26,13 +29,17 @@ const mail_service_1 = require("../mail/mail.service");
 const roles_enum_1 = require("../roles/roles.enum");
 const session_service_1 = require("../session/session.service");
 const statuses_enum_1 = require("../statuses/statuses.enum");
+const mongoose_1 = require("@nestjs/mongoose");
+const mongoose_2 = require("mongoose");
+const otp_schema_1 = require("../users/schema/otp.schema");
 let AuthService = class AuthService {
-    constructor(jwtService, usersService, sessionService, mailService, configService) {
+    constructor(jwtService, usersService, sessionService, mailService, configService, otpModel) {
         this.jwtService = jwtService;
         this.usersService = usersService;
         this.sessionService = sessionService;
         this.mailService = mailService;
         this.configService = configService;
+        this.otpModel = otpModel;
     }
     async validateLogin(loginDto) {
         const user = await this.usersService.findByEmail(loginDto.email);
@@ -83,11 +90,22 @@ let AuthService = class AuthService {
             sessionId: session.id,
             hash,
         });
+        const isCompleteProfile = !!(user.firstName &&
+            user.lastName &&
+            user.fullName &&
+            user.phoneNumber &&
+            user.address);
+        const isUserVerified = user.isEmailVerified || false;
+        const userWithFlags = {
+            ...user,
+            isUserVerified,
+            isCompleteProfile,
+        };
         return {
             success: true,
             message: 'Login successful',
             data: {
-                user,
+                user: userWithFlags,
                 token,
                 refreshToken,
                 tokenExpires,
@@ -235,9 +253,6 @@ let AuthService = class AuthService {
             throw new common_1.UnprocessableEntityException({
                 success: false,
                 message: 'Invalid OTP',
-                errors: {
-                    otpCode: 'invalidOtp',
-                },
             });
         }
         await this.usersService.updateEmailVerified(userFindOutById.id, true);
@@ -513,49 +528,92 @@ let AuthService = class AuthService {
             expiresIn: tokenExpiresIn,
         });
         try {
+            const otpCode = '1234';
+            const otpExpiresAt = new Date(tokenExpires);
+            await this.otpModel.create({
+                code: otpCode,
+                email: email,
+                userId: user.id,
+                type: otp_schema_1.OtpType.FORGOT_PASSWORD,
+                expiresAt: otpExpiresAt,
+                isUsed: false,
+            });
             await this.mailService.forgotPassword({
                 to: email,
                 data: {
                     hash,
                     tokenExpires,
+                    otp: otpCode,
                 },
             });
             return {
                 success: true,
-                message: 'If the email exists, a password reset link has been sent',
+                message: 'If the email exists, a password reset OTP has been sent',
             };
         }
         catch (error) {
-            console.error('Failed to send forgot password email:', error);
-            return {
-                success: true,
-                message: 'If the email exists, a password reset link has been sent',
-            };
+            throw new common_1.UnprocessableEntityException({
+                success: false,
+                message: 'Failed to send forgot password email',
+            });
         }
     }
-    async resetPassword(hash, password) {
+    async verifyForgotPasswordOtp(dto) {
+        const user = await this.usersService.findByEmail(dto.email);
+        if (!user) {
+            throw new common_1.UnprocessableEntityException({
+                success: false,
+                message: 'User not found',
+            });
+        }
+        const otpRecord = await this.otpModel
+            .findOne({
+            email: dto.email.toLowerCase(),
+            code: dto.otpCode,
+            type: otp_schema_1.OtpType.FORGOT_PASSWORD,
+            isUsed: false,
+        })
+            .sort({ createdAt: -1 })
+            .exec();
+        if (!otpRecord) {
+            throw new common_1.UnprocessableEntityException({
+                success: false,
+                message: 'Invalid or expired OTP',
+            });
+        }
+        if (new Date() > otpRecord.expiresAt) {
+            throw new common_1.UnprocessableEntityException({
+                success: false,
+                message: 'OTP has expired',
+            });
+        }
+        otpRecord.isUsed = true;
+        otpRecord.usedAt = new Date();
+        await otpRecord.save();
+        const tokenExpiresIn = this.configService.getOrThrow('auth.forgotExpires', {
+            infer: true,
+        });
+        const tokenExpires = Date.now() + (0, ms_1.default)(tokenExpiresIn);
+        const hash = await this.jwtService.signAsync({
+            forgotUserId: user.id,
+        }, {
+            secret: this.configService.getOrThrow('auth.forgotSecret', {
+                infer: true,
+            }),
+            expiresIn: tokenExpiresIn,
+        });
+        return {
+            success: true,
+            message: 'OTP verified successfully. You can now reset your password.',
+            data: {
+                resetToken: hash,
+            },
+        };
+    }
+    async resetPassword(resetToken, password) {
         let userId;
-        let token = hash;
-        if (hash.includes('&expires=')) {
-            token = hash.split('&expires=')[0];
-        }
-        if (hash.includes('&expires=')) {
-            const expiresMatch = hash.match(/&expires=(\d+)/);
-            if (expiresMatch) {
-                const expiresTimestamp = parseInt(expiresMatch[1], 10);
-                const currentTime = Date.now();
-                if (currentTime > expiresTimestamp) {
-                    throw new common_1.UnprocessableEntityException({
-                        success: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
-                        errors: {
-                            hash: 'expiredHash',
-                        },
-                    });
-                }
-            }
-        }
         try {
-            const jwtData = await this.jwtService.verifyAsync(token, {
+            const jwtData = await this.jwtService.verifyAsync(resetToken, {
                 secret: this.configService.getOrThrow('auth.forgotSecret', {
                     infer: true,
                 }),
@@ -564,29 +622,24 @@ let AuthService = class AuthService {
         }
         catch {
             throw new common_1.UnprocessableEntityException({
-                success: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
-                errors: {
-                    hash: 'invalidHash',
-                },
+                success: false,
+                message: 'Invalid reset password token',
             });
         }
         const user = await this.usersService.findById(userId);
         if (!user) {
             throw new common_1.UnprocessableEntityException({
-                success: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
-                errors: {
-                    hash: 'notFound',
-                },
+                success: false,
+                message: 'User not found',
             });
         }
-        user.password = password;
-        await this.sessionService.deleteByUserId({
-            userId: user.id,
+        await this.sessionService.deleteByUserId({ userId: user.id });
+        await this.usersService.update(user.id, {
+            password: password,
         });
-        await this.usersService.update(user.id, user);
         return {
             success: true,
-            message: 'Password reset successfullys',
+            message: 'Password reset successfully',
         };
     }
     async me(userJwtPayload) {
@@ -757,10 +810,12 @@ let AuthService = class AuthService {
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
+    __param(5, (0, mongoose_1.InjectModel)(otp_schema_1.OtpSchemaClass.name)),
     __metadata("design:paramtypes", [jwt_1.JwtService,
         users_service_1.UsersService,
         session_service_1.SessionService,
         mail_service_1.MailService,
-        config_1.ConfigService])
+        config_1.ConfigService,
+        mongoose_2.Model])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

@@ -35,6 +35,8 @@ const otp_verify_response_dto_1 = require("./dto/otp-verify-response.dto");
 const register_response_dto_1 = require("./dto/register-response.dto");
 const forgot_password_response_dto_1 = require("./dto/forgot-password-response.dto");
 const reset_password_response_dto_1 = require("./dto/reset-password-response.dto");
+const auth_forgot_password_otp_verify_dto_1 = require("./dto/auth-forgot-password-otp-verify.dto");
+const forgot_password_otp_verify_response_dto_1 = require("./dto/forgot-password-otp-verify-response.dto");
 let AuthController = class AuthController {
     constructor(service) {
         this.service = service;
@@ -63,8 +65,11 @@ let AuthController = class AuthController {
     async forgotPassword(forgotPasswordDto) {
         return this.service.forgotPassword(forgotPasswordDto.email);
     }
+    async verifyForgotPasswordOtp(verifyOtpDto) {
+        return this.service.verifyForgotPasswordOtp(verifyOtpDto);
+    }
     resetPassword(resetPasswordDto) {
-        return this.service.resetPassword(resetPasswordDto.hash, resetPasswordDto.password);
+        return this.service.resetPassword(resetPasswordDto.resetToken, resetPasswordDto.password);
     }
     me(request) {
         return this.service.me(request.user);
@@ -164,6 +169,15 @@ __decorate([
     __metadata("design:paramtypes", [auth_forgot_password_dto_1.AuthForgotPasswordDto]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "forgotPassword", null);
+__decorate([
+    (0, common_1.Post)('forgot/password/verify-otp'),
+    (0, swagger_1.ApiOkResponse)({ type: forgot_password_otp_verify_response_dto_1.ForgotPasswordOtpVerifyResponseDto }),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [auth_forgot_password_otp_verify_dto_1.AuthForgotPasswordOtpVerifyDto]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "verifyForgotPasswordOtp", null);
 __decorate([
     (0, common_1.Post)('reset/password'),
     (0, swagger_1.ApiOkResponse)({ type: reset_password_response_dto_1.ResetPasswordResponseDto }),

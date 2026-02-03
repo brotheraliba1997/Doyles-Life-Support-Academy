@@ -9,20 +9,22 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AuthResetPasswordDto = void 0;
+exports.AuthForgotPasswordOtpVerifyDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
-class AuthResetPasswordDto {
+class AuthForgotPasswordOtpVerifyDto {
 }
-exports.AuthResetPasswordDto = AuthResetPasswordDto;
+exports.AuthForgotPasswordOtpVerifyDto = AuthForgotPasswordOtpVerifyDto;
 __decorate([
-    (0, swagger_1.ApiProperty)(),
+    (0, swagger_1.ApiProperty)({ example: 'user@example.com', description: 'User email address' }),
     (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsEmail)(),
     __metadata("design:type", String)
-], AuthResetPasswordDto.prototype, "password", void 0);
+], AuthForgotPasswordOtpVerifyDto.prototype, "email", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)(),
+    (0, swagger_1.ApiProperty)({ example: '1234', description: 'OTP code received via email' }),
     (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
-], AuthResetPasswordDto.prototype, "resetToken", void 0);
-//# sourceMappingURL=auth-reset-password.dto.js.map
+], AuthForgotPasswordOtpVerifyDto.prototype, "otpCode", void 0);
+//# sourceMappingURL=auth-forgot-password-otp-verify.dto.js.map

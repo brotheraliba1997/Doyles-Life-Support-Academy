@@ -75,22 +75,13 @@ let MailService = class MailService {
                 i18n.t('reset-password.text4'),
             ]);
         }
-        const url = new URL(this.configService.getOrThrow('app.frontendDomain', {
-            infer: true,
-        }) + '/password-change');
-        url.searchParams.set('hash', mailData.data.hash);
-        url.searchParams.set('expires', mailData.data.tokenExpires.toString());
         await this.mailerService.sendMail({
             to: mailData.to,
             subject: resetPasswordTitle,
-            text: `${url.toString()} ${resetPasswordTitle}`,
-            templatePath: path_1.default.join(this.configService.getOrThrow('app.workingDirectory', {
-                infer: true,
-            }), 'src', 'mail', 'mail-templates', 'reset-password.hbs'),
+            text: `${resetPasswordTitle} - OTP: ${mailData.data.otp}`,
+            templatePath: path_1.default.join(this.configService.getOrThrow('app.workingDirectory', { infer: true }), 'src', 'mail', 'mail-templates', 'reset-password.hbs'),
             context: {
                 title: resetPasswordTitle,
-                url: url.toString(),
-                actionTitle: resetPasswordTitle,
                 app_name: this.configService.get('app.name', {
                     infer: true,
                 }),
@@ -98,6 +89,7 @@ let MailService = class MailService {
                 text2,
                 text3,
                 text4,
+                otp: mailData.data.otp,
             },
         });
     }

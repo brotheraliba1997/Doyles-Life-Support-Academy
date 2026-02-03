@@ -28,6 +28,9 @@ import { Session } from '../session/domain/session';
 import { SessionService } from '../session/session.service';
 import { StatusEnum } from '../statuses/statuses.enum';
 import { User } from '../users/domain/user';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { OtpSchemaClass, OtpType } from '../users/schema/otp.schema';
 import { AuthRegisterStep1Dto } from './dto/auth-register-step1.dto';
 import { AuthOtpVerifyDto } from './dto/auth-otp-verify.dto';
 import { AuthResendOtpDto } from './dto/auth-resend-otp.dto';
@@ -37,6 +40,8 @@ import { RegisterStep1ResponseDto } from './dto/register-step1-response.dto';
 import { RegisterResponseDto } from './dto/register-response.dto';
 import { ForgotPasswordResponseDto } from './dto/forgot-password-response.dto';
 import { ResetPasswordResponseDto } from './dto/reset-password-response.dto';
+import { AuthForgotPasswordOtpVerifyDto } from './dto/auth-forgot-password-otp-verify.dto';
+import { ForgotPasswordOtpVerifyResponseDto } from './dto/forgot-password-otp-verify-response.dto';
 
 @Injectable()
 export class AuthService {
@@ -46,6 +51,8 @@ export class AuthService {
     private sessionService: SessionService,
     private mailService: MailService,
     private configService: ConfigService<AllConfigType>,
+    @InjectModel(OtpSchemaClass.name)
+    private readonly otpModel: Model<OtpSchemaClass>,
   ) {}
 
   async validateLogin(loginDto: AuthEmailLoginDto): Promise<LoginResponseSuccessDto> {
@@ -109,18 +116,33 @@ export class AuthService {
       hash,
     });
 
-    return {
+    const isCompleteProfile = !!(
+      user.firstName &&
+      user.lastName &&
+      user.fullName &&
+      user.phoneNumber &&
+      user.address
+    );
 
+    const isUserVerified = user.isEmailVerified || false;
+
+    // Add isUserVerified and isCompleteProfile to user object
+    const userWithFlags = {
+      ...user,
+      isUserVerified,
+      isCompleteProfile,
+    };
+
+    return {
       success: true,
       message: 'Login successful',
       data: {
-        user,
+        user: userWithFlags,
         token,
         refreshToken,
         tokenExpires,
       },
     };
-   
   }
 
   async validateSocialLogin(
@@ -295,9 +317,7 @@ export class AuthService {
       throw new UnprocessableEntityException({
         success: false,
         message: 'Invalid OTP',
-        errors: {
-          otpCode: 'invalidOtp',
-        },
+      
       });
     }
 
@@ -637,62 +657,125 @@ export class AuthService {
         expiresIn: tokenExpiresIn,
       },
     );
-
-    // Only send email if user exists, but don't reveal this to the client
     try {
+      const otpCode = '1234';
+      const otpExpiresAt = new Date(tokenExpires);
+
+      // Save OTP to database
+      await this.otpModel.create({
+        code: otpCode,
+        email: email,
+        userId: user.id,
+        type: OtpType.FORGOT_PASSWORD,
+        expiresAt: otpExpiresAt,
+        isUsed: false,
+      });
+
       await this.mailService.forgotPassword({
         to: email,
         data: {
           hash,
           tokenExpires,
+          otp: otpCode,
         },
       });
 
       return {
         success: true,
-        message: 'If the email exists, a password reset link has been sent',
+        message: 'If the email exists, a password reset OTP has been sent',
       };
     } catch (error) {
-     
-      console.error('Failed to send forgot password email:', error);
-     
-      return {
-        success: true,
-        message: 'If the email exists, a password reset link has been sent',
-      };
+      throw new UnprocessableEntityException({
+        success: false,
+        message: 'Failed to send forgot password email',
+      });
+    
     }
   }
 
-  async resetPassword(hash: string, password: string): Promise<ResetPasswordResponseDto> {
+  async verifyForgotPasswordOtp(
+    dto: AuthForgotPasswordOtpVerifyDto,
+  ): Promise<ForgotPasswordOtpVerifyResponseDto> {
+    const user = await this.usersService.findByEmail(dto.email);
+    if (!user) {
+      throw new UnprocessableEntityException({
+        success: false,
+        message: 'User not found',
+      });
+    }
+
+    // Find the latest unused OTP for this email and type
+    const otpRecord = await this.otpModel
+      .findOne({
+        email: dto.email.toLowerCase(),
+        code: dto.otpCode,
+        type: OtpType.FORGOT_PASSWORD,
+        isUsed: false,
+      })
+      .sort({ createdAt: -1 })
+      .exec();
+
+    if (!otpRecord) {
+      throw new UnprocessableEntityException({
+        success: false,
+        message: 'Invalid or expired OTP',
+       
+      });
+    }
+
+    // Check if OTP is expired
+    if (new Date() > otpRecord.expiresAt) {
+      throw new UnprocessableEntityException({
+        success: false,
+        message: 'OTP has expired',
+        
+      });
+    }
+
+    // Mark OTP as used
+    otpRecord.isUsed = true;
+    otpRecord.usedAt = new Date();
+    await otpRecord.save();
+
+    // Generate reset password token/hash
+    const tokenExpiresIn = this.configService.getOrThrow('auth.forgotExpires', {
+      infer: true,
+    });
+
+    const tokenExpires = Date.now() + ms(tokenExpiresIn);
+
+    const hash = await this.jwtService.signAsync(
+      {
+        forgotUserId: user.id,
+      },
+      {
+        secret: this.configService.getOrThrow('auth.forgotSecret', {
+          infer: true,
+        }),
+        expiresIn: tokenExpiresIn,
+      },
+    );
+
+    return {
+      success: true,
+      message: 'OTP verified successfully. You can now reset your password.',
+      data: {
+        resetToken: hash,
+      
+      },
+    };
+  }
+
+  async resetPassword(
+    resetToken: string,
+    password: string,
+  ): Promise<ResetPasswordResponseDto> {
     let userId: User['id'];
-
-    // Extract JWT token from hash (remove &expires=... part if present)
-    let token = hash;
-    if (hash.includes('&expires=')) {
-      token = hash.split('&expires=')[0];
-    }
-
-    // Optionally validate expires timestamp if present
-    if (hash.includes('&expires=')) {
-      const expiresMatch = hash.match(/&expires=(\d+)/);
-      if (expiresMatch) {
-        const expiresTimestamp = parseInt(expiresMatch[1], 10);
-        const currentTime = Date.now();
-        if (currentTime > expiresTimestamp) {
-          throw new UnprocessableEntityException({
-            success: HttpStatus.UNPROCESSABLE_ENTITY,
-            errors: {
-              hash: 'expiredHash',
-            },
-          });
-        }
-      }
-    }
 
     try {
       const jwtData = await this.jwtService.verifyAsync<{
         forgotUserId: User['id'];
-      }>(token, {
+      }>(resetToken, {
         secret: this.configService.getOrThrow('auth.forgotSecret', {
           infer: true,
         }),
@@ -701,10 +784,9 @@ export class AuthService {
       userId = jwtData.forgotUserId;
     } catch {
       throw new UnprocessableEntityException({
-        success: HttpStatus.UNPROCESSABLE_ENTITY,
-        errors: {
-          hash: 'invalidHash',
-        },
+        success: false,
+        message: 'Invalid reset password token',
+       
       });
     }
 
@@ -712,27 +794,27 @@ export class AuthService {
 
     if (!user) {
       throw new UnprocessableEntityException({
-        success: HttpStatus.UNPROCESSABLE_ENTITY,
-        errors: {
-          hash: 'notFound',
-        },
+        success: false,
+        message: 'User not found',
+       
       });
     }
 
-    user.password = password;
-
-    await this.sessionService.deleteByUserId({
-      userId: user.id,
+    // Delete all user sessions to force re-login
+    await this.sessionService.deleteByUserId({ userId: user.id });
+    
+    // Update password - usersService.update will hash it automatically
+    // Pass plain password, service will compare and hash if different
+    await this.usersService.update(user.id, {
+      password: password,
     });
-
-    await this.usersService.update(user.id, user);
 
     return {
       success: true,
-      message: 'Password reset successfullys',
-    
+      message: 'Password reset successfully',
     };
   }
+  
 
   async me(userJwtPayload: JwtPayloadType): Promise<NullableType<User>> {
     return this.usersService.findById(userJwtPayload.id);

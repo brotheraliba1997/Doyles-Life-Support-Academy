@@ -18,6 +18,8 @@ import { OtpVerifyResponseDto } from './dto/otp-verify-response.dto';
 import { RegisterResponseDto } from './dto/register-response.dto';
 import { ForgotPasswordResponseDto } from './dto/forgot-password-response.dto';
 import { ResetPasswordResponseDto } from './dto/reset-password-response.dto';
+import { AuthForgotPasswordOtpVerifyDto } from './dto/auth-forgot-password-otp-verify.dto';
+import { ForgotPasswordOtpVerifyResponseDto } from './dto/forgot-password-otp-verify-response.dto';
 import { JwtPayloadType } from './strategies/types/jwt-payload.type';
 export declare class AuthController {
     private readonly service;
@@ -32,6 +34,7 @@ export declare class AuthController {
     confirmEmail(confirmEmailDto: AuthConfirmEmailDto): Promise<void>;
     confirmNewEmail(confirmEmailDto: AuthConfirmEmailDto): Promise<void>;
     forgotPassword(forgotPasswordDto: AuthForgotPasswordDto): Promise<ForgotPasswordResponseDto>;
+    verifyForgotPasswordOtp(verifyOtpDto: AuthForgotPasswordOtpVerifyDto): Promise<ForgotPasswordOtpVerifyResponseDto>;
     resetPassword(resetPasswordDto: AuthResetPasswordDto): Promise<ResetPasswordResponseDto>;
     me(request: any): Promise<NullableType<User>>;
     refresh(request: any): Promise<RefreshResponseDto>;
