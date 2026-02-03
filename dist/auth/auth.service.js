@@ -164,10 +164,14 @@ let AuthService = class AuthService {
             hash,
         });
         return {
-            refreshToken,
-            token: jwtToken,
-            tokenExpires,
-            user,
+            success: true,
+            message: 'Login successful',
+            data: {
+                user,
+                token: jwtToken,
+                refreshToken,
+                tokenExpires,
+            },
         };
     }
     async registerStep1(dto) {

@@ -32,7 +32,7 @@ let AuthAppleController = class AuthAppleController {
 exports.AuthAppleController = AuthAppleController;
 __decorate([
     (0, swagger_1.ApiOkResponse)({
-        type: login_response_dto_1.LoginResponseDto,
+        type: login_response_dto_1.LoginResponseSuccessDto,
     }),
     (0, common_1.SerializeOptions)({
         groups: ['me'],

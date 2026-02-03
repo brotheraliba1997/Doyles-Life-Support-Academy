@@ -30,7 +30,7 @@ export declare class AuthService {
     private configService;
     constructor(jwtService: JwtService, usersService: UsersService, sessionService: SessionService, mailService: MailService, configService: ConfigService<AllConfigType>);
     validateLogin(loginDto: AuthEmailLoginDto): Promise<LoginResponseSuccessDto>;
-    validateSocialLogin(authProvider: string, socialData: SocialInterface): Promise<LoginResponseDto>;
+    validateSocialLogin(authProvider: string, socialData: SocialInterface): Promise<LoginResponseSuccessDto>;
     registerStep1(dto: AuthRegisterStep1Dto): Promise<RegisterStep1ResponseDto>;
     OTPVerify(dto: AuthOtpVerifyDto, user: JwtPayloadType): Promise<OtpVerifyResponseDto>;
     resendOtp(dto: AuthResendOtpDto): Promise<ResendOtpResponseDto>;

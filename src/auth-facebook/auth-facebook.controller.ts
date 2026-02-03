@@ -10,7 +10,7 @@ import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { AuthService } from '../auth/auth.service';
 import { AuthFacebookService } from './auth-facebook.service';
 import { AuthFacebookLoginDto } from './dto/auth-facebook-login.dto';
-import { LoginResponseDto } from '../auth/dto/login-response.dto';
+import { LoginResponseSuccessDto } from '../auth/dto/login-response.dto';
 
 @ApiTags('Auth')
 @Controller({
@@ -24,7 +24,7 @@ export class AuthFacebookController {
   ) {}
 
   @ApiOkResponse({
-    type: LoginResponseDto,
+    type: LoginResponseSuccessDto,
   })
   @SerializeOptions({
     groups: ['me'],
@@ -33,7 +33,7 @@ export class AuthFacebookController {
   @HttpCode(HttpStatus.OK)
   async login(
     @Body() loginDto: AuthFacebookLoginDto,
-  ): Promise<LoginResponseDto> {
+  ): Promise<LoginResponseSuccessDto> {
     const socialData =
       await this.authFacebookService.getProfileByToken(loginDto);
 

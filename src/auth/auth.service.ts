@@ -126,7 +126,7 @@ export class AuthService {
   async validateSocialLogin(
     authProvider: string,
     socialData: SocialInterface,
-  ): Promise<LoginResponseDto> {
+  ): Promise<LoginResponseSuccessDto> {
     let user: NullableType<User> = null;
     const socialEmail = socialData.email?.toLowerCase();
     let userByEmail: NullableType<User> = null;
@@ -208,10 +208,15 @@ export class AuthService {
     });
 
     return {
-      refreshToken,
-      token: jwtToken,
-      tokenExpires,
-      user,
+
+      success: true,
+      message: 'Login successful',
+      data: {
+        user,
+        token: jwtToken,
+        refreshToken,
+        tokenExpires,
+      },
     };
   }
 

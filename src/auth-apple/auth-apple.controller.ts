@@ -10,7 +10,7 @@ import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { AuthService } from '../auth/auth.service';
 import { AuthAppleService } from './auth-apple.service';
 import { AuthAppleLoginDto } from './dto/auth-apple-login.dto';
-import { LoginResponseDto } from '../auth/dto/login-response.dto';
+import { LoginResponseSuccessDto } from '../auth/dto/login-response.dto';
 
 @ApiTags('Auth')
 @Controller({
@@ -24,14 +24,14 @@ export class AuthAppleController {
   ) {}
 
   @ApiOkResponse({
-    type: LoginResponseDto,
+    type: LoginResponseSuccessDto,
   })
   @SerializeOptions({
     groups: ['me'],
   })
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  async login(@Body() loginDto: AuthAppleLoginDto): Promise<LoginResponseDto> {
+  async login(@Body() loginDto: AuthAppleLoginDto): Promise<LoginResponseSuccessDto> {
     const socialData = await this.authAppleService.getProfileByToken(loginDto);
 
     return this.authService.validateSocialLogin('apple', socialData);
