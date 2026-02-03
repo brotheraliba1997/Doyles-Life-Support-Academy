@@ -193,10 +193,8 @@ export class AuthService {
 
     if (!user) {
       throw new UnprocessableEntityException({
-        status: HttpStatus.UNPROCESSABLE_ENTITY,
-        errors: {
-          user: 'userNotFound',
-        },
+        success: false, 
+        message: 'User not found',
       });
     }
 
@@ -599,10 +597,8 @@ export class AuthService {
       newEmail = jwtData.newEmail;
     } catch {
       throw new UnprocessableEntityException({
-        status: HttpStatus.UNPROCESSABLE_ENTITY,
-        errors: {
-          hash: `invalidHash`,
-        },
+        success: false, 
+        message: 'Invalid hash',
       });
     }
 
@@ -610,8 +606,9 @@ export class AuthService {
 
     if (!user) {
       throw new NotFoundException({
-        status: HttpStatus.NOT_FOUND,
-        error: `notFound`,
+            success: false, 
+      
+        message: 'User not found',
       });
     }
 
@@ -820,29 +817,23 @@ export class AuthService {
 
     if (!currentUser) {
       throw new UnprocessableEntityException({
-        success: HttpStatus.UNPROCESSABLE_ENTITY,
-        errors: {
-          user: 'userNotFound',
-        },
+        success: false, 
+        message: 'User not found',
       });
     }
 
     if (userDto.password) {
       if (!userDto.oldPassword) {
         throw new UnprocessableEntityException({
-          success: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            oldPassword: 'missingOldPassword',
-          },
+          success: false, 
+          message: 'Missing old password',
         });
       }
 
       if (!currentUser.password) {
         throw new UnprocessableEntityException({
-          success: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            oldPassword: 'incorrectOldPassword',
-          },
+          success: false, 
+          message: 'Incorrect old password',
         });
       }
 
@@ -871,10 +862,8 @@ export class AuthService {
 
       if (userByEmail && userByEmail.id !== currentUser.id) {
         throw new UnprocessableEntityException({
-          success: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            email: 'emailExists',
-          },
+          success: false, 
+          message: 'Email already exists',
         });
       }
 

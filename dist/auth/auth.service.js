@@ -153,10 +153,8 @@ let AuthService = class AuthService {
         }
         if (!user) {
             throw new common_1.UnprocessableEntityException({
-                status: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
-                errors: {
-                    user: 'userNotFound',
-                },
+                success: false,
+                message: 'User not found',
             });
         }
         const hash = crypto_1.default
@@ -480,17 +478,15 @@ let AuthService = class AuthService {
         }
         catch {
             throw new common_1.UnprocessableEntityException({
-                status: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
-                errors: {
-                    hash: `invalidHash`,
-                },
+                success: false,
+                message: 'Invalid hash',
             });
         }
         const user = await this.usersService.findById(userId);
         if (!user) {
             throw new common_1.NotFoundException({
-                status: common_1.HttpStatus.NOT_FOUND,
-                error: `notFound`,
+                success: false,
+                message: 'User not found',
             });
         }
         user.email = newEmail;
@@ -641,27 +637,21 @@ let AuthService = class AuthService {
         const currentUser = await this.usersService.findById(userJwtPayload.id);
         if (!currentUser) {
             throw new common_1.UnprocessableEntityException({
-                success: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
-                errors: {
-                    user: 'userNotFound',
-                },
+                success: false,
+                message: 'User not found',
             });
         }
         if (userDto.password) {
             if (!userDto.oldPassword) {
                 throw new common_1.UnprocessableEntityException({
-                    success: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
-                    errors: {
-                        oldPassword: 'missingOldPassword',
-                    },
+                    success: false,
+                    message: 'Missing old password',
                 });
             }
             if (!currentUser.password) {
                 throw new common_1.UnprocessableEntityException({
-                    success: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
-                    errors: {
-                        oldPassword: 'incorrectOldPassword',
-                    },
+                    success: false,
+                    message: 'Incorrect old password',
                 });
             }
             const isValidOldPassword = await bcryptjs_1.default.compare(userDto.oldPassword, currentUser.password);
@@ -684,10 +674,8 @@ let AuthService = class AuthService {
             const userByEmail = await this.usersService.findByEmail(userDto.email);
             if (userByEmail && userByEmail.id !== currentUser.id) {
                 throw new common_1.UnprocessableEntityException({
-                    success: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
-                    errors: {
-                        email: 'emailExists',
-                    },
+                    success: false,
+                    message: 'Email already exists',
                 });
             }
             const hash = await this.jwtService.signAsync({
