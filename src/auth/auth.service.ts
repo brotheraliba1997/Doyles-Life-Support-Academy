@@ -275,15 +275,13 @@ export class AuthService {
      
     };
   }
-  async OTPVerify(dto: AuthOtpVerifyDto): Promise<OtpVerifyResponseDto> {
-    const user = await this.usersService.findById(dto.userId);
-    if (!user) {
+  async   OTPVerify(dto: AuthOtpVerifyDto, user: JwtPayloadType): Promise<OtpVerifyResponseDto> {
+    const userFindOutById = await this.usersService.findById(dto.userId);
+    if (!userFindOutById) {
       throw new UnprocessableEntityException({
         success: false,
         message: 'User not found',
-        errors: {
-          userId: 'userNotFound',
-        },
+        
       });
     }
 
@@ -317,15 +315,33 @@ export class AuthService {
       updatedUser.address
     );
 
+    const hash = crypto
+      .createHash('sha256')
+      .update(randomStringGenerator())
+      .digest('hex');
+
+    const session = await this.sessionService.create({
+      user: updatedUser,
+      hash,
+    });
+
+    const { token, refreshToken, tokenExpires } = await this.getTokensData({
+      id: updatedUser.id,
+      role: updatedUser.role,
+      sessionId: session.id,
+      hash,
+    });
+
     return {
       success: true,
       message: 'OTP verified successfully',
       data: {
         isUserVerified: true,
-        isCompleteProfile: isCompleteProfile,
-      }
-    
-     
+        token,
+        refreshToken,
+        tokenExpires,
+        isCompleteProfile,
+      },
     };
   }
 

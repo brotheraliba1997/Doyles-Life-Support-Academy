@@ -21,6 +21,18 @@ __decorate([
     __metadata("design:type", Boolean)
 ], RegisterStep1ResponseDataDto.prototype, "isUserVerified", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ description: 'JWT access token' }),
+    __metadata("design:type", String)
+], RegisterStep1ResponseDataDto.prototype, "token", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'JWT refresh token' }),
+    __metadata("design:type", String)
+], RegisterStep1ResponseDataDto.prototype, "refreshToken", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Token expiry timestamp (ms)' }),
+    __metadata("design:type", Number)
+], RegisterStep1ResponseDataDto.prototype, "tokenExpires", void 0);
+__decorate([
     (0, swagger_1.ApiProperty)({ example: false, description: 'Profile completion status' }),
     __metadata("design:type", Boolean)
 ], RegisterStep1ResponseDataDto.prototype, "isCompleteProfile", void 0);

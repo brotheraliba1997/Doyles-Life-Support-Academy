@@ -32,7 +32,7 @@ export declare class AuthService {
     validateLogin(loginDto: AuthEmailLoginDto): Promise<LoginResponseSuccessDto>;
     validateSocialLogin(authProvider: string, socialData: SocialInterface): Promise<LoginResponseDto>;
     registerStep1(dto: AuthRegisterStep1Dto): Promise<RegisterStep1ResponseDto>;
-    OTPVerify(dto: AuthOtpVerifyDto): Promise<OtpVerifyResponseDto>;
+    OTPVerify(dto: AuthOtpVerifyDto, user: JwtPayloadType): Promise<OtpVerifyResponseDto>;
     resendOtp(dto: AuthResendOtpDto): Promise<ResendOtpResponseDto>;
     register(dto: AuthRegisterLoginDto, jwtPayload?: JwtPayloadType): Promise<RegisterResponseDto>;
     confirmEmail(hash: string): Promise<void>;

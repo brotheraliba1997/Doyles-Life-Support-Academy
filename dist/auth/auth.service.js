@@ -218,15 +218,12 @@ let AuthService = class AuthService {
             message: 'Registration completed successfully',
         };
     }
-    async OTPVerify(dto) {
-        const user = await this.usersService.findById(dto.userId);
-        if (!user) {
+    async OTPVerify(dto, user) {
+        const userFindOutById = await this.usersService.findById(dto.userId);
+        if (!userFindOutById) {
             throw new common_1.UnprocessableEntityException({
                 success: false,
                 message: 'User not found',
-                errors: {
-                    userId: 'userNotFound',
-                },
             });
         }
         const validOtp = '123456';
@@ -252,13 +249,30 @@ let AuthService = class AuthService {
             updatedUser.fullName &&
             updatedUser.phoneNumber &&
             updatedUser.address);
+        const hash = crypto_1.default
+            .createHash('sha256')
+            .update((0, random_string_generator_util_1.randomStringGenerator)())
+            .digest('hex');
+        const session = await this.sessionService.create({
+            user: updatedUser,
+            hash,
+        });
+        const { token, refreshToken, tokenExpires } = await this.getTokensData({
+            id: updatedUser.id,
+            role: updatedUser.role,
+            sessionId: session.id,
+            hash,
+        });
         return {
             success: true,
             message: 'OTP verified successfully',
             data: {
                 isUserVerified: true,
-                isCompleteProfile: isCompleteProfile,
-            }
+                token,
+                refreshToken,
+                tokenExpires,
+                isCompleteProfile,
+            },
         };
     }
     async resendOtp(dto) {
