@@ -222,7 +222,7 @@ let AuthService = class AuthService {
             message: 'Registration completed successfully',
         };
     }
-    async OTPVerify(dto, user) {
+    async OTPVerify(dto) {
         const userFindOutById = await this.usersService.findById(dto.userId);
         if (!userFindOutById) {
             throw new common_1.UnprocessableEntityException({
@@ -240,19 +240,14 @@ let AuthService = class AuthService {
                 },
             });
         }
-        await this.usersService.updateEmailVerified(user.id, true);
-        const updatedUser = await this.usersService.findById(user.id);
+        await this.usersService.updateEmailVerified(userFindOutById.id, true);
+        const updatedUser = await this.usersService.findById(userFindOutById.id);
         if (!updatedUser) {
             throw new common_1.UnprocessableEntityException({
                 success: false,
                 message: 'User not found',
             });
         }
-        const isCompleteProfile = !!(updatedUser.firstName &&
-            updatedUser.lastName &&
-            updatedUser.fullName &&
-            updatedUser.phoneNumber &&
-            updatedUser.address);
         const hash = crypto_1.default
             .createHash('sha256')
             .update((0, random_string_generator_util_1.randomStringGenerator)())
@@ -271,11 +266,13 @@ let AuthService = class AuthService {
             success: true,
             message: 'OTP verified successfully',
             data: {
-                isUserVerified: true,
                 token,
                 refreshToken,
                 tokenExpires,
-                isCompleteProfile,
+                isUserVerified: true,
+                isCompleteProfile: true,
+                otp: validOtp,
+                userId: userFindOutById.id,
             },
         };
     }

@@ -63,16 +63,15 @@ export class AuthController {
   }
 
 
-  @UseGuards(AuthGuard('jwt'))
-  @ApiBearerAuth()
+ 
   @Post('OTP/verify')
   @ApiOkResponse({ type: OtpVerifyResponseDto })
   @HttpCode(HttpStatus.OK)
   async OTPVerify(
     @Body() otpVerifyDto: AuthOtpVerifyDto,
-    @Request() req: { user: JwtPayloadType },
+   
   ): Promise<OtpVerifyResponseDto> {
-    return this.service.OTPVerify(otpVerifyDto, req.user);
+    return this.service.OTPVerify(otpVerifyDto);
   }
 
   @Post('OTP/resend')

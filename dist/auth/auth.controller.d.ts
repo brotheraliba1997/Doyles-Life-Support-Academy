@@ -24,9 +24,7 @@ export declare class AuthController {
     constructor(service: AuthService);
     login(loginDto: AuthEmailLoginDto): Promise<LoginResponseSuccessDto>;
     registerStep1(createUserDto: AuthRegisterStep1Dto): Promise<RegisterStep1ResponseDto>;
-    OTPVerify(otpVerifyDto: AuthOtpVerifyDto, req: {
-        user: JwtPayloadType;
-    }): Promise<OtpVerifyResponseDto>;
+    OTPVerify(otpVerifyDto: AuthOtpVerifyDto): Promise<OtpVerifyResponseDto>;
     resendOtp(resendOtpDto: AuthResendOtpDto): Promise<ResendOtpResponseDto>;
     register(createUserDto: AuthRegisterLoginDto, req: {
         user: JwtPayloadType;

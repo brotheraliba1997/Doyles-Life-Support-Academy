@@ -1,13 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { User } from '../../users/domain/user';
 import { IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
 
-
-export class RegisterStep1ResponseDataDto {
-  @ApiProperty({ example: false, description: 'User verification status' })
-  isUserVerified: boolean;
-
+export class OtpVerifyResponseDataDto {
   @ApiProperty({ description: 'JWT access token' })
   token: string;
 
@@ -17,8 +12,17 @@ export class RegisterStep1ResponseDataDto {
   @ApiProperty({ description: 'Token expiry timestamp (ms)' })
   tokenExpires: number;
 
-  @ApiProperty({ example: false, description: 'Profile completion status' })
+  @ApiProperty({ example: true, description: 'User email verified status' })
+  isUserVerified: boolean;
+
+  @ApiProperty({ example: true, description: 'Profile completion status' })
   isCompleteProfile: boolean;
+
+  @ApiProperty({ description: 'OTP code (for debugging)' })
+  otp: string;
+
+  @ApiProperty({ description: 'User ID' })
+  userId: number | string;
 }
 
 export class OtpVerifyResponseDto {
@@ -28,9 +32,8 @@ export class OtpVerifyResponseDto {
   @ApiProperty({ example: 'OTP verified successfully', description: 'Human-readable response message' })
   message: string;
 
-
-  @ApiProperty({ type: RegisterStep1ResponseDataDto })
+  @ApiProperty({ type: OtpVerifyResponseDataDto })
   @IsOptional()
-  @Type(() => RegisterStep1ResponseDataDto)
-  data: RegisterStep1ResponseDataDto;
+  @Type(() => OtpVerifyResponseDataDto)
+  data: OtpVerifyResponseDataDto;
 }

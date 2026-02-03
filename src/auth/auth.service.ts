@@ -280,7 +280,7 @@ export class AuthService {
      
     };
   }
-  async   OTPVerify(dto: AuthOtpVerifyDto, user: JwtPayloadType): Promise<OtpVerifyResponseDto> {
+  async OTPVerify(dto: AuthOtpVerifyDto): Promise<OtpVerifyResponseDto> {
     const userFindOutById = await this.usersService.findById(dto.userId);
     if (!userFindOutById) {
       throw new UnprocessableEntityException({
@@ -301,8 +301,8 @@ export class AuthService {
       });
     }
 
-    await this.usersService.updateEmailVerified(user.id, true);
-    const updatedUser = await this.usersService.findById(user.id);
+    await this.usersService.updateEmailVerified(userFindOutById.id, true);
+    const updatedUser = await this.usersService.findById(userFindOutById.id);
 
     if (!updatedUser) {
       throw new UnprocessableEntityException({
@@ -311,14 +311,6 @@ export class AuthService {
        
       });
     }
-
-    const isCompleteProfile = !!(
-      updatedUser.firstName &&
-      updatedUser.lastName &&
-      updatedUser.fullName &&
-      updatedUser.phoneNumber &&
-      updatedUser.address
-    );
 
     const hash = crypto
       .createHash('sha256')
@@ -341,11 +333,13 @@ export class AuthService {
       success: true,
       message: 'OTP verified successfully',
       data: {
-        isUserVerified: true,
         token,
         refreshToken,
         tokenExpires,
-        isCompleteProfile,
+        isUserVerified: true,
+        isCompleteProfile: true,
+        otp: validOtp,
+        userId: userFindOutById.id,
       },
     };
   }

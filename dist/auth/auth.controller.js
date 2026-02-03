@@ -45,8 +45,8 @@ let AuthController = class AuthController {
     async registerStep1(createUserDto) {
         return this.service.registerStep1(createUserDto);
     }
-    async OTPVerify(otpVerifyDto, req) {
-        return this.service.OTPVerify(otpVerifyDto, req.user);
+    async OTPVerify(otpVerifyDto) {
+        return this.service.OTPVerify(otpVerifyDto);
     }
     async resendOtp(resendOtpDto) {
         return this.service.resendOtp(resendOtpDto);
@@ -110,15 +110,12 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "registerStep1", null);
 __decorate([
-    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
-    (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.Post)('OTP/verify'),
     (0, swagger_1.ApiOkResponse)({ type: otp_verify_response_dto_1.OtpVerifyResponseDto }),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     __param(0, (0, common_1.Body)()),
-    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [auth_otp_verify_dto_1.AuthOtpVerifyDto, Object]),
+    __metadata("design:paramtypes", [auth_otp_verify_dto_1.AuthOtpVerifyDto]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "OTPVerify", null);
 __decorate([

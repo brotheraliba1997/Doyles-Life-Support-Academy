@@ -9,33 +9,41 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.OtpVerifyResponseDto = exports.RegisterStep1ResponseDataDto = void 0;
+exports.OtpVerifyResponseDto = exports.OtpVerifyResponseDataDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 const class_transformer_1 = require("class-transformer");
-class RegisterStep1ResponseDataDto {
+class OtpVerifyResponseDataDto {
 }
-exports.RegisterStep1ResponseDataDto = RegisterStep1ResponseDataDto;
-__decorate([
-    (0, swagger_1.ApiProperty)({ example: false, description: 'User verification status' }),
-    __metadata("design:type", Boolean)
-], RegisterStep1ResponseDataDto.prototype, "isUserVerified", void 0);
+exports.OtpVerifyResponseDataDto = OtpVerifyResponseDataDto;
 __decorate([
     (0, swagger_1.ApiProperty)({ description: 'JWT access token' }),
     __metadata("design:type", String)
-], RegisterStep1ResponseDataDto.prototype, "token", void 0);
+], OtpVerifyResponseDataDto.prototype, "token", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ description: 'JWT refresh token' }),
     __metadata("design:type", String)
-], RegisterStep1ResponseDataDto.prototype, "refreshToken", void 0);
+], OtpVerifyResponseDataDto.prototype, "refreshToken", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ description: 'Token expiry timestamp (ms)' }),
     __metadata("design:type", Number)
-], RegisterStep1ResponseDataDto.prototype, "tokenExpires", void 0);
+], OtpVerifyResponseDataDto.prototype, "tokenExpires", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: false, description: 'Profile completion status' }),
+    (0, swagger_1.ApiProperty)({ example: true, description: 'User email verified status' }),
     __metadata("design:type", Boolean)
-], RegisterStep1ResponseDataDto.prototype, "isCompleteProfile", void 0);
+], OtpVerifyResponseDataDto.prototype, "isUserVerified", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: true, description: 'Profile completion status' }),
+    __metadata("design:type", Boolean)
+], OtpVerifyResponseDataDto.prototype, "isCompleteProfile", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'OTP code (for debugging)' }),
+    __metadata("design:type", String)
+], OtpVerifyResponseDataDto.prototype, "otp", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'User ID' }),
+    __metadata("design:type", Object)
+], OtpVerifyResponseDataDto.prototype, "userId", void 0);
 class OtpVerifyResponseDto {
 }
 exports.OtpVerifyResponseDto = OtpVerifyResponseDto;
@@ -48,9 +56,9 @@ __decorate([
     __metadata("design:type", String)
 ], OtpVerifyResponseDto.prototype, "message", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ type: RegisterStep1ResponseDataDto }),
+    (0, swagger_1.ApiProperty)({ type: OtpVerifyResponseDataDto }),
     (0, class_validator_1.IsOptional)(),
-    (0, class_transformer_1.Type)(() => RegisterStep1ResponseDataDto),
-    __metadata("design:type", RegisterStep1ResponseDataDto)
+    (0, class_transformer_1.Type)(() => OtpVerifyResponseDataDto),
+    __metadata("design:type", OtpVerifyResponseDataDto)
 ], OtpVerifyResponseDto.prototype, "data", void 0);
 //# sourceMappingURL=otp-verify-response.dto.js.map
