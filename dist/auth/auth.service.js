@@ -45,35 +45,27 @@ let AuthService = class AuthService {
         const user = await this.usersService.findByEmail(loginDto.email);
         if (!user) {
             throw new common_1.UnprocessableEntityException({
-                status: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
-                errors: {
-                    email: 'notFound',
-                },
+                success: false,
+                message: 'User not found',
             });
         }
         if (user.provider !== auth_providers_enum_1.AuthProvidersEnum.email) {
             throw new common_1.UnprocessableEntityException({
-                status: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
-                errors: {
-                    email: `needLoginViaProvider:${user.provider}`,
-                },
+                success: false,
+                message: `needLoginViaProvider:${user.provider}`,
             });
         }
         if (!user.password) {
             throw new common_1.UnprocessableEntityException({
-                status: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
-                errors: {
-                    password: 'incorrectPassword',
-                },
+                success: false,
+                message: 'Incorrect password',
             });
         }
         const isValidPassword = await bcryptjs_1.default.compare(loginDto.password, user.password);
         if (!isValidPassword) {
             throw new common_1.UnprocessableEntityException({
-                status: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
-                errors: {
-                    password: 'incorrectPassword',
-                },
+                success: false,
+                message: 'Incorrect password',
             });
         }
         const hash = crypto_1.default
