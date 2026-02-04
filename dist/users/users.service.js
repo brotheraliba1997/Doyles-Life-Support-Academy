@@ -296,6 +296,9 @@ let UsersService = class UsersService {
             .lean();
         return updated ? this.map(updated) : null;
     }
+    async findByFirebaseUid(uid) {
+        return this.userModel.findOne({ firebaseUid: uid });
+    }
     async remove(id) {
         await this.userModel.deleteOne({ _id: id });
     }

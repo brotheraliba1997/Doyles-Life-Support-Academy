@@ -42,6 +42,8 @@ import { ForgotPasswordResponseDto } from './dto/forgot-password-response.dto';
 import { ResetPasswordResponseDto } from './dto/reset-password-response.dto';
 import { AuthForgotPasswordOtpVerifyDto } from './dto/auth-forgot-password-otp-verify.dto';
 import { ForgotPasswordOtpVerifyResponseDto } from './dto/forgot-password-otp-verify-response.dto';
+import { admin } from '../firebase/firebase-admin';
+import { DecodedFirebaseTokenDto } from './dto/decodedToken.dto';
 
 @Injectable()
 export class AuthService {
@@ -414,9 +416,9 @@ export class AuthService {
 
     // Update existing user with complete profile data
     const updatedUser = await this.usersService.update(existingUser?.id, {
-      firstName: dto.firstName,
-      lastName: dto.lastName,
-      fullName: dto.fullName,
+      firstName: existingUser.firstName ?? dto.firstName ,
+      lastName: existingUser.lastName ?? dto.lastName,  
+      fullName: existingUser.fullName ?? dto.fullName,
       company: dto.company ?? null,
       jobTitle: dto.jobTitle ?? null,
       emailAddress: dto.emailAddress ?? dto.email,
@@ -803,6 +805,112 @@ export class AuthService {
       message: 'Password reset successfully',
     };
   }
+
+
+  async firebaseLogin(firebaseToken: string) {
+    let decodedToken;
+  
+    try {
+      decodedToken = await admin.auth().verifyIdToken(firebaseToken);
+    } catch {
+      throw new UnprocessableEntityException({
+        success: false,
+        message: 'Invalid Firebase token',
+      });
+    }
+  
+    const {
+      uid,
+      email,
+      name,
+      firebase: { sign_in_provider },
+    } = decodedToken;
+
+    if (!email) {
+      throw new UnprocessableEntityException({
+        success: false,
+        message: 'Email not found in Firebase token',
+      });
+    }
+  
+    let user = await this.usersService.findByFirebaseUid(uid);
+
+    if (!user) {
+      // Split name into firstName and lastName if available
+      const nameParts = name ? name.split(' ') : [];
+      const firstName = nameParts[0] || null;
+      const lastName = nameParts.slice(1).join(' ') || null;
+
+      user = await this.usersService.create({
+        provider: sign_in_provider,  
+        socialId: uid,               
+        email: email,
+        firstName: firstName,
+        lastName: lastName,
+        fullName: name || null,
+        company: '',
+        jobTitle: '',
+        emailAddress: email,
+        phoneNumber: 0,
+        country: '',
+        industry: '',
+        role: {
+          id: RoleEnum.student,
+        },
+        status: {
+          id: StatusEnum.inactive,
+        },
+      });
+    }
+
+    
+    const hash = crypto
+      .createHash('sha256')
+      .update(randomStringGenerator())
+      .digest('hex');
+
+    const session = await this.sessionService.create({
+      user,
+      hash,
+    });
+
+    const { token, refreshToken, tokenExpires } = await this.getTokensData({
+      id: user.id,
+      role: user.role,
+      sessionId: session.id,
+      hash,
+    });
+
+    const isCompleteProfile = !!(
+      user.firstName &&
+      user.lastName &&
+      user.fullName &&
+      user.phoneNumber &&
+      user.address
+    );
+
+    const isUserVerified = user.isEmailVerified || false;
+
+    const userWithFlags = {
+      ...user,
+      isUserVerified,
+      isCompleteProfile,
+    };
+
+    return {
+      success: true,
+      message: 'Login successful',
+      data: {
+        user: userWithFlags,
+        token,
+        refreshToken,
+        tokenExpires,
+      },
+    };
+  }
+
+
+
   
 
   async me(userJwtPayload: JwtPayloadType): Promise<NullableType<User>> {
@@ -844,7 +952,8 @@ export class AuthService {
 
       if (!isValidOldPassword) {
         throw new UnprocessableEntityException({
-          success: HttpStatus.UNPROCESSABLE_ENTITY,
+          success:    false,
+          
           errors: {
             oldPassword: 'incorrectOldPassword',
           },

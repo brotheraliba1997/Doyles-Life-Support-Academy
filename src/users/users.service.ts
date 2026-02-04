@@ -386,6 +386,11 @@ export class UsersService {
     return updated ? this.map(updated) : null;
   }
 
+  async findByFirebaseUid(uid: string): Promise<NullableType<User>> {
+    return this.userModel.findOne({ firebaseUid: uid });
+  }
+  
+
   async remove(id: User['id']): Promise<void> {
     await this.userModel.deleteOne({ _id: id });
   }

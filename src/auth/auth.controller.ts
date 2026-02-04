@@ -36,6 +36,7 @@ import { ResetPasswordResponseDto } from './dto/reset-password-response.dto';
 import { AuthForgotPasswordOtpVerifyDto } from './dto/auth-forgot-password-otp-verify.dto';
 import { ForgotPasswordOtpVerifyResponseDto } from './dto/forgot-password-otp-verify-response.dto';
 import { JwtPayloadType } from './strategies/types/jwt-payload.type';
+import { FirebaseLoginDto } from './dto/FirebaseLogin.dto';
 
 @ApiTags('Auth')
 @Controller({
@@ -143,19 +144,13 @@ export class AuthController {
     );
   }
 
-  @ApiBearerAuth()
-  @SerializeOptions({
-    groups: ['me'],
-  })
-  @Get('me')
-  @UseGuards(AuthGuard('jwt'))
-  @ApiOkResponse({
-    type: User,
-  })
-  @HttpCode(HttpStatus.OK)
-  public me(@Request() request): Promise<NullableType<User>> {
-    return this.service.me(request.user);
-  }
+
+  @Post('social/login')
+async firebaseLogin(@Body() dto: FirebaseLoginDto) {
+  return this.service.firebaseLogin(dto.token);
+}
+
+
 
   @ApiBearerAuth()
   @ApiOkResponse({

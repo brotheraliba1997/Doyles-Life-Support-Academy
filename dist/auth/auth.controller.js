@@ -37,6 +37,7 @@ const forgot_password_response_dto_1 = require("./dto/forgot-password-response.d
 const reset_password_response_dto_1 = require("./dto/reset-password-response.dto");
 const auth_forgot_password_otp_verify_dto_1 = require("./dto/auth-forgot-password-otp-verify.dto");
 const forgot_password_otp_verify_response_dto_1 = require("./dto/forgot-password-otp-verify-response.dto");
+const FirebaseLogin_dto_1 = require("./dto/FirebaseLogin.dto");
 let AuthController = class AuthController {
     constructor(service) {
         this.service = service;
@@ -71,8 +72,8 @@ let AuthController = class AuthController {
     resetPassword(resetPasswordDto) {
         return this.service.resetPassword(resetPasswordDto.resetToken, resetPasswordDto.password);
     }
-    me(request) {
-        return this.service.me(request.user);
+    async firebaseLogin(dto) {
+        return this.service.firebaseLogin(dto.token);
     }
     refresh(request) {
         return this.service.refreshToken({
@@ -188,21 +189,12 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "resetPassword", null);
 __decorate([
-    (0, swagger_1.ApiBearerAuth)(),
-    (0, common_1.SerializeOptions)({
-        groups: ['me'],
-    }),
-    (0, common_1.Get)('me'),
-    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
-    (0, swagger_1.ApiOkResponse)({
-        type: user_1.User,
-    }),
-    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
-    __param(0, (0, common_1.Request)()),
+    (0, common_1.Post)('social/login'),
+    __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [FirebaseLogin_dto_1.FirebaseLoginDto]),
     __metadata("design:returntype", Promise)
-], AuthController.prototype, "me", null);
+], AuthController.prototype, "firebaseLogin", null);
 __decorate([
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOkResponse)({

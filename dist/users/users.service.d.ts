@@ -28,5 +28,6 @@ export declare class UsersService {
     }): Promise<NullableType<User>>;
     update(id: User['id'], updateUserDto: UpdateUserDto): Promise<User | null>;
     updateEmailVerified(id: User['id'], isEmailVerified: boolean): Promise<User | null>;
+    findByFirebaseUid(uid: string): Promise<NullableType<User>>;
     remove(id: User['id']): Promise<void>;
 }

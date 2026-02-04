@@ -32,6 +32,7 @@ const statuses_enum_1 = require("../statuses/statuses.enum");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const otp_schema_1 = require("../users/schema/otp.schema");
+const firebase_admin_1 = require("../firebase/firebase-admin");
 let AuthService = class AuthService {
     constructor(jwtService, usersService, sessionService, mailService, configService, otpModel) {
         this.jwtService = jwtService;
@@ -321,9 +322,9 @@ let AuthService = class AuthService {
             });
         }
         const updatedUser = await this.usersService.update(existingUser?.id, {
-            firstName: dto.firstName,
-            lastName: dto.lastName,
-            fullName: dto.fullName,
+            firstName: existingUser.firstName ?? dto.firstName,
+            lastName: existingUser.lastName ?? dto.lastName,
+            fullName: existingUser.fullName ?? dto.fullName,
             company: dto.company ?? null,
             jobTitle: dto.jobTitle ?? null,
             emailAddress: dto.emailAddress ?? dto.email,
@@ -630,6 +631,86 @@ let AuthService = class AuthService {
             message: 'Password reset successfully',
         };
     }
+    async firebaseLogin(firebaseToken) {
+        let decodedToken;
+        try {
+            decodedToken = await firebase_admin_1.admin.auth().verifyIdToken(firebaseToken);
+        }
+        catch {
+            throw new common_1.UnprocessableEntityException({
+                success: false,
+                message: 'Invalid Firebase token',
+            });
+        }
+        const { uid, email, name, firebase: { sign_in_provider }, } = decodedToken;
+        if (!email) {
+            throw new common_1.UnprocessableEntityException({
+                success: false,
+                message: 'Email not found in Firebase token',
+            });
+        }
+        let user = await this.usersService.findByFirebaseUid(uid);
+        if (!user) {
+            const nameParts = name ? name.split(' ') : [];
+            const firstName = nameParts[0] || null;
+            const lastName = nameParts.slice(1).join(' ') || null;
+            user = await this.usersService.create({
+                provider: sign_in_provider,
+                socialId: uid,
+                email: email,
+                firstName: firstName,
+                lastName: lastName,
+                fullName: name || null,
+                company: '',
+                jobTitle: '',
+                emailAddress: email,
+                phoneNumber: 0,
+                country: '',
+                industry: '',
+                role: {
+                    id: roles_enum_1.RoleEnum.student,
+                },
+                status: {
+                    id: statuses_enum_1.StatusEnum.inactive,
+                },
+            });
+        }
+        const hash = crypto_1.default
+            .createHash('sha256')
+            .update((0, random_string_generator_util_1.randomStringGenerator)())
+            .digest('hex');
+        const session = await this.sessionService.create({
+            user,
+            hash,
+        });
+        const { token, refreshToken, tokenExpires } = await this.getTokensData({
+            id: user.id,
+            role: user.role,
+            sessionId: session.id,
+            hash,
+        });
+        const isCompleteProfile = !!(user.firstName &&
+            user.lastName &&
+            user.fullName &&
+            user.phoneNumber &&
+            user.address);
+        const isUserVerified = user.isEmailVerified || false;
+        const userWithFlags = {
+            ...user,
+            isUserVerified,
+            isCompleteProfile,
+        };
+        return {
+            success: true,
+            message: 'Login successful',
+            data: {
+                user: userWithFlags,
+                token,
+                refreshToken,
+                tokenExpires,
+            },
+        };
+    }
     async me(userJwtPayload) {
         return this.usersService.findById(userJwtPayload.id);
     }
@@ -657,7 +738,7 @@ let AuthService = class AuthService {
             const isValidOldPassword = await bcryptjs_1.default.compare(userDto.oldPassword, currentUser.password);
             if (!isValidOldPassword) {
                 throw new common_1.UnprocessableEntityException({
-                    success: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
+                    success: false,
                     errors: {
                         oldPassword: 'incorrectOldPassword',
                     },
