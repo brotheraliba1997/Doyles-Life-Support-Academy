@@ -523,7 +523,7 @@ export class AuthService {
       refreshToken = tokens.refreshToken;
       tokenExpires = tokens.tokenExpires;
     }
-      const otpCode = "1234"
+      const otpCode = "123456"
 
     return {
       success: true,
@@ -627,7 +627,10 @@ export class AuthService {
     if (!user) {
       return {
         success: true,
-        message: 'If the email exists, a password reset link has been sents',
+        message: 'If the email exists, a password reset OTP has been sent',
+        data: {
+          id: null,
+        },
       };
     }
 
@@ -649,7 +652,7 @@ export class AuthService {
       },
     );
     try {
-      const otpCode = '1234';
+      const otpCode = '123456';
       const otpExpiresAt = new Date(tokenExpires);
 
       // Save OTP to database
@@ -665,6 +668,7 @@ export class AuthService {
       await this.mailService.forgotPassword({
         to: email,
         data: {
+
           hash,
           tokenExpires,
           otp: otpCode,
@@ -674,6 +678,10 @@ export class AuthService {
       return {
         success: true,
         message: 'If the email exists, a password reset OTP has been sent',
+        data : {
+          id: user?.id,
+      
+        },
       };
     } catch (error) {
       throw new UnprocessableEntityException({

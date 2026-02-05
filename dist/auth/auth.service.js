@@ -419,7 +419,7 @@ let AuthService = class AuthService {
             refreshToken = tokens.refreshToken;
             tokenExpires = tokens.tokenExpires;
         }
-        const otpCode = "1234";
+        const otpCode = "123456";
         return {
             success: true,
             data: {
@@ -501,7 +501,10 @@ let AuthService = class AuthService {
         if (!user) {
             return {
                 success: true,
-                message: 'If the email exists, a password reset link has been sents',
+                message: 'If the email exists, a password reset OTP has been sent',
+                data: {
+                    id: null,
+                },
             };
         }
         const tokenExpiresIn = this.configService.getOrThrow('auth.forgotExpires', {
@@ -517,7 +520,7 @@ let AuthService = class AuthService {
             expiresIn: tokenExpiresIn,
         });
         try {
-            const otpCode = '1234';
+            const otpCode = '123456';
             const otpExpiresAt = new Date(tokenExpires);
             await this.otpModel.create({
                 code: otpCode,
@@ -538,6 +541,9 @@ let AuthService = class AuthService {
             return {
                 success: true,
                 message: 'If the email exists, a password reset OTP has been sent',
+                data: {
+                    id: user?.id,
+                },
             };
         }
         catch (error) {

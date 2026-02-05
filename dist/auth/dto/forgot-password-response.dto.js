@@ -9,8 +9,15 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ForgotPasswordResponseDto = void 0;
+exports.ForgotPasswordResponseDto = exports.ForgotPasswordResponseDataDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
+class ForgotPasswordResponseDataDto {
+}
+exports.ForgotPasswordResponseDataDto = ForgotPasswordResponseDataDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: '507f1f77bcf86cd799439011', description: 'User ID' }),
+    __metadata("design:type", Object)
+], ForgotPasswordResponseDataDto.prototype, "id", void 0);
 class ForgotPasswordResponseDto {
 }
 exports.ForgotPasswordResponseDto = ForgotPasswordResponseDto;
@@ -19,7 +26,11 @@ __decorate([
     __metadata("design:type", Boolean)
 ], ForgotPasswordResponseDto.prototype, "success", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'If the email exists, a password reset link has been sent', description: 'Human-readable response message' }),
+    (0, swagger_1.ApiProperty)({ example: 'If the email exists, a password reset OTP has been sent', description: 'Human-readable response message' }),
     __metadata("design:type", String)
 ], ForgotPasswordResponseDto.prototype, "message", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: ForgotPasswordResponseDataDto }),
+    __metadata("design:type", ForgotPasswordResponseDataDto)
+], ForgotPasswordResponseDto.prototype, "data", void 0);
 //# sourceMappingURL=forgot-password-response.dto.js.map
