@@ -1,11 +1,14 @@
+export declare class OtpVerifyUserResponseDto {
+    id: number | string;
+    isUserVerified: boolean;
+    isCompanyVerified: boolean;
+}
 export declare class OtpVerifyResponseDataDto {
     token: string;
     refreshToken: string;
     tokenExpires: number;
-    isUserVerified: boolean;
-    isCompleteProfile: boolean;
     otp: string;
-    userId: number | string;
+    user: OtpVerifyUserResponseDto;
 }
 export declare class OtpVerifyResponseDto {
     success: boolean;

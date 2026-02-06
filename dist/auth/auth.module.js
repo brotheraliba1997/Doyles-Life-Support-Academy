@@ -20,6 +20,7 @@ const session_module_1 = require("../session/session.module");
 const users_module_1 = require("../users/users.module");
 const mongoose_1 = require("@nestjs/mongoose");
 const otp_schema_1 = require("../users/schema/otp.schema");
+const isuerOtp_schema_1 = require("../users/schema/isuerOtp.schema");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
@@ -33,6 +34,7 @@ exports.AuthModule = AuthModule = __decorate([
             jwt_1.JwtModule.register({}),
             mongoose_1.MongooseModule.forFeature([
                 { name: otp_schema_1.OtpSchemaClass.name, schema: otp_schema_1.OtpSchema },
+                { name: isuerOtp_schema_1.UserOtpSchemaClass.name, schema: isuerOtp_schema_1.UserOtpSchema },
             ]),
         ],
         controllers: [auth_controller_1.AuthController],

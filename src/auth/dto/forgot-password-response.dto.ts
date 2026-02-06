@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsOptional } from 'class-validator';
 
 export class ForgotPasswordResponseDataDto {
   @ApiProperty({ example: '507f1f77bcf86cd799439011', description: 'User ID' })
@@ -13,5 +14,6 @@ export class ForgotPasswordResponseDto {
   message: string;
 
   @ApiProperty({ type: ForgotPasswordResponseDataDto })
+  @IsOptional()
   data: ForgotPasswordResponseDataDto;
 }

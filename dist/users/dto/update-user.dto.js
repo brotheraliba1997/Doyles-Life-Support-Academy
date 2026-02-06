@@ -61,4 +61,16 @@ __decorate([
     (0, class_transformer_1.Type)(() => status_dto_1.StatusDto),
     __metadata("design:type", status_dto_1.StatusDto)
 ], UpdateUserDto.prototype, "status", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: true, description: 'Is user verified', type: Boolean }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsBoolean)(),
+    __metadata("design:type", Boolean)
+], UpdateUserDto.prototype, "isUserVerified", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: true, description: 'Is company verified', type: Boolean }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsBoolean)(),
+    __metadata("design:type", Boolean)
+], UpdateUserDto.prototype, "isCompanyVerified", void 0);
 //# sourceMappingURL=update-user.dto.js.map

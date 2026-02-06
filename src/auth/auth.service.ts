@@ -29,8 +29,9 @@ import { SessionService } from '../session/session.service';
 import { StatusEnum } from '../statuses/statuses.enum';
 import { User } from '../users/domain/user';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { OtpSchemaClass, OtpType } from '../users/schema/otp.schema';
+import { UserOtpSchemaClass, UserOtpType } from '../users/schema/isuerOtp.schema';
 import { AuthRegisterStep1Dto } from './dto/auth-register-step1.dto';
 import { AuthOtpVerifyDto } from './dto/auth-otp-verify.dto';
 import { AuthResendOtpDto } from './dto/auth-resend-otp.dto';
@@ -44,6 +45,7 @@ import { AuthForgotPasswordOtpVerifyDto } from './dto/auth-forgot-password-otp-v
 import { ForgotPasswordOtpVerifyResponseDto } from './dto/forgot-password-otp-verify-response.dto';
 import { admin } from '../firebase/firebase-admin';
 import { DecodedFirebaseTokenDto } from './dto/decodedToken.dto';
+import { AuthForgotPasswordDto } from './dto/auth-forgot-password.dto';
 
 @Injectable()
 export class AuthService {
@@ -55,6 +57,9 @@ export class AuthService {
     private configService: ConfigService<AllConfigType>,
     @InjectModel(OtpSchemaClass.name)
     private readonly otpModel: Model<OtpSchemaClass>,
+    @InjectModel(UserOtpSchemaClass.name)
+    private readonly userOtpModel: Model<UserOtpSchemaClass>,
+  
   ) {}
 
   async validateLogin(loginDto: AuthEmailLoginDto): Promise<LoginResponseSuccessDto> {
@@ -110,21 +115,10 @@ export class AuthService {
       hash,
     });
 
-    const isCompleteProfile = !!(
-      user.firstName &&
-      user.lastName &&
-      user.fullName &&
-      user.phoneNumber &&
-      user.address
-    );
-
-    const isUserVerified = user.isEmailVerified || false;
-
-    // Add isUserVerified and isCompleteProfile to user object
     const userWithFlags = {
       ...user,
-      isUserVerified,
-      isCompleteProfile,
+      isUserVerified: user.isUserVerified,
+      isCompanyVerified: (user as any).isCompanyVerified || false,
     };
 
     return {
@@ -140,9 +134,8 @@ export class AuthService {
   }
 
   async validateSocialLogin(
-    authProvider: string,
-    socialData: SocialInterface,
-  ): Promise<LoginResponseSuccessDto> {
+     authProvider: string,
+     socialData: SocialInterface): Promise<LoginResponseSuccessDto> {
     let user: NullableType<User> = null;
     const socialEmail = socialData.email?.toLowerCase();
     let userByEmail: NullableType<User> = null;
@@ -236,8 +229,7 @@ export class AuthService {
 
 
 
-  async registerStep1(dto: AuthRegisterStep1Dto): Promise<RegisterStep1ResponseDto> {
-    // Check if user already exists
+  async registerCreateUser(dto: AuthRegisterStep1Dto): Promise<RegisterStep1ResponseDto> {
     const existingUser = await this.usersService.findByEmail(dto.email);
     if (existingUser) {
       throw new UnprocessableEntityException({
@@ -266,62 +258,105 @@ export class AuthService {
       status: {
         id: StatusEnum.inactive,
       },
+      isUserVerified: false,
+      isCompanyVerified: false,
+    });
+    
+    await this.userOtpModel.create({
+      userId: new Types.ObjectId(user.id as string),
+      code: "123456",
+      email: user.email,
+      type: UserOtpType.REGISTER,
+      expiresAt: new Date(Date.now() + 10 * 60 * 1000),
+      isUsed: false,
     });
 
-    const otpCode = '123456';
-    const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000); 
-
-    const isCompleteProfile = !!(
-      user.firstName &&
-      user.lastName &&
-      user.fullName &&
-      user.phoneNumber &&
-      user.address
-    );
-
-    const isUserVerified = user.isEmailVerified || false;
     return {
-     
       success: true,
       data: {
-        isUserVerified,
-        isCompleteProfile,
+        isUserVerified: user.isUserVerified,
+        isCompleteProfile: user.isCompanyVerified,
          id: user.id,
       email: user.email || dto.email, 
-    
       },
       message: 'Registration completed successfully',
      
     };
   }
   async OTPVerify(dto: AuthOtpVerifyDto): Promise<OtpVerifyResponseDto> {
+    // Validate MongoDB ObjectId format
+    if (typeof dto.userId === 'string' && !Types.ObjectId.isValid(dto.userId)) {
+      throw new UnprocessableEntityException({
+        success: false,
+        message: 'Your id is not valid',
+      });
+    }
+
     const userFindOutById = await this.usersService.findById(dto.userId);
+
     if (!userFindOutById) {
       throw new UnprocessableEntityException({
         success: false,
         message: 'User not found',
-        
       });
     }
 
-    const validOtp = '123456';
-    if (dto.otpCode !== validOtp) {
+    // Map DTO type to UserOtpType
+    const otpType = dto.type === 'register' ? UserOtpType.REGISTER : 
+                    dto.type === 'forgot' ? UserOtpType.FORGOT_PASSWORD : 
+                    UserOtpType.EMAIL_VERIFICATION;
+
+    // Find OTP in database
+    const userOtp = await this.userOtpModel.findOne({
+      userId: new Types.ObjectId(userFindOutById.id as string),
+      code: dto.otpCode,
+      type: otpType,
+      isUsed: false,
+    });
+
+    if (!userOtp) {
       throw new UnprocessableEntityException({
         success: false,
         message: 'Invalid OTP',
-      
       });
     }
 
-    await this.usersService.updateEmailVerified(userFindOutById.id, true);
-    const updatedUser = await this.usersService.findById(userFindOutById.id);
+    // Check if OTP is expired
+    if (userOtp.expiresAt < new Date()) {
+      throw new UnprocessableEntityException({
+        success: false,
+        message: 'OTP has expired',
+      });
+    }
 
-    if (!updatedUser) {
+
+    await this.usersService.updateEmailVerified(userFindOutById.id, true);
+
+    if(!userOtp.isUsed) {
+        userOtp.isUsed = true;  
+        await userOtp.save();
+    }
+
+    // Update user verification status
+    const updatedUser = await this.usersService.update(userFindOutById.id, {
+      isUserVerified: true,
+    });
+
+    if(!updatedUser) {
       throw new UnprocessableEntityException({
         success: false,
         message: 'User not found',
-       
       });
+    }
+
+    
+
+
+    const userResponse = {
+      id: updatedUser.id,
+      email: updatedUser.email,
+      isUserVerified: updatedUser.isUserVerified,
+      isCompanyVerified: (updatedUser as any).isCompanyVerified || false,
     }
 
     const hash = crypto
@@ -348,15 +383,20 @@ export class AuthService {
         token,
         refreshToken,
         tokenExpires,
-        isUserVerified: true,
-        isCompleteProfile: true,
-        otp: validOtp,
-        userId: userFindOutById.id,
+        otp: userOtp.code,
+        user: userResponse,
       },
     };
   }
 
   async resendOtp(dto: AuthResendOtpDto): Promise<ResendOtpResponseDto> {
+    if (typeof dto.userId === 'string' && !Types.ObjectId.isValid(dto.userId)) {
+      throw new UnprocessableEntityException({
+        success: false,
+        message: 'Your id is not valid',
+      });
+    }
+
     const user = await this.usersService.findById(dto.userId);
 
     if (!user) {
@@ -367,34 +407,49 @@ export class AuthService {
       });
     }
 
-    if (!user.email) {
-      throw new UnprocessableEntityException({
-        success: false,
-        message: 'Email not found',
-     
-      });
-    }
+ 
 
-    // Generate OTP (temporarily hardcoded - will be replaced with SMTP later)
+    
     const otpCode = '123456';
-    const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes from now
+    const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000); 
 
-    const isCompleteProfile = !!(
-      user.firstName &&
-      user.lastName &&
-      user.fullName &&
-      user.phoneNumber &&
-      user.address
+    await this.userOtpModel.findOneAndUpdate(
+      {
+        type: UserOtpType.REGISTER,
+        isUsed: false,
+        expiresAt: { $gt: new Date() },
+        $or: [
+          { userId: new Types.ObjectId(user.id as string) },
+          { email: user.email }
+        ]
+      },
+      {
+        $set: {
+          code: otpCode,
+          expiresAt: otpExpiresAt,
+          userId: new Types.ObjectId(user.id as string),
+          email: user.email,
+        }
+      },
+      { new: true, upsert: true }
     );
+
+   
+
+    const userResponse = {
+      id: user.id,
+      isUserVerified: user.isUserVerified || false,
+      isCompanyVerified: (user as any).isCompanyVerified || false,
+    };
 
     return {
       success: true,
       message: 'OTP sent successfully to your email',
       data: {
-        isUserVerified: user.isEmailVerified || false,
-        isCompleteProfile: isCompleteProfile,
+        otp: otpCode,
+        otpExpiresAt: otpExpiresAt,
+        user: userResponse,
       },
-   
     };
   }
 
@@ -403,22 +458,24 @@ export class AuthService {
     jwtPayload?: JwtPayloadType,
   ): Promise<RegisterResponseDto> {
     const existingUser = await this.usersService.findByEmail(dto.email);
-    console.log(existingUser, 'existingUser');
+  
+
+
     if (!existingUser) {
       throw new UnprocessableEntityException({
         success: false,
-        message: 'User not found or email not verified',
+        message: 'User not found ',
       
       });
     }
   
-  
 
-    // Update existing user with complete profile data
     const updatedUser = await this.usersService.update(existingUser?.id, {
-      firstName: existingUser.firstName ?? dto.firstName ,
-      lastName: existingUser.lastName ?? dto.lastName,  
-      fullName: existingUser.fullName ?? dto.fullName,
+      email: existingUser.email,
+      password: existingUser.password,
+      firstName: dto.firstName ,
+      lastName:  dto.lastName,  
+      fullName:  dto.fullName,
       company: dto.company ?? null,
       jobTitle: dto.jobTitle ?? null,
       emailAddress: dto.emailAddress ?? dto.email,
@@ -440,6 +497,9 @@ export class AuthService {
       deviceToken: dto.deviceToken,
       deviceType: dto.deviceType,
       role: dto.role ? { id: dto.role } : undefined,
+      isUserVerified: true,
+      isCompanyVerified: true,
+     
     });
 
     if (!updatedUser) {
@@ -450,31 +510,24 @@ export class AuthService {
       });
     }
 
- 
-
-    const isCompleteProfile = !!(
-      updatedUser.firstName &&
-      updatedUser.lastName &&
-      updatedUser.fullName &&
-      updatedUser.phoneNumber &&
-      updatedUser.address
-    );
-
-    const isUserVerified = updatedUser.isEmailVerified || false;
-
     let token: string;
     let refreshToken: string;
     let tokenExpires: number;
 
     if (jwtPayload?.sessionId) {
-      const existingSession = await this.sessionService.findById(
-        jwtPayload.sessionId,
-      );
+      const existingSession = await this.sessionService.findById(jwtPayload.sessionId);
+
+      if(!existingSession) {
+        throw new UnprocessableEntityException({
+          success: false,
+          message: 'Session not found',
+          
+        });
+      }
+
+
       if (existingSession && existingSession.user?.id === updatedUser.id) {
-        const hash = crypto
-          .createHash('sha256')
-          .update(randomStringGenerator())
-          .digest('hex');
+        const hash = crypto.createHash('sha256').update(randomStringGenerator()).digest('hex');
         await this.sessionService.update(existingSession.id, { hash });
         const tokens = await this.getTokensData({
           id: updatedUser.id,
@@ -486,10 +539,7 @@ export class AuthService {
         refreshToken = tokens.refreshToken;
         tokenExpires = tokens.tokenExpires;
       } else {
-        const hash = crypto
-          .createHash('sha256')
-          .update(randomStringGenerator())
-          .digest('hex');
+        const hash = crypto .createHash('sha256').update(randomStringGenerator()).digest('hex');
         const session = await this.sessionService.create({
           user: updatedUser,
           hash,
@@ -505,10 +555,7 @@ export class AuthService {
         tokenExpires = tokens.tokenExpires;
       }
     } else {
-      const hash = crypto
-        .createHash('sha256')
-        .update(randomStringGenerator())
-        .digest('hex');
+      const hash = crypto.createHash('sha256').update(randomStringGenerator()).digest('hex');
       const session = await this.sessionService.create({
         user: updatedUser,
         hash,
@@ -523,7 +570,7 @@ export class AuthService {
       refreshToken = tokens.refreshToken;
       tokenExpires = tokens.tokenExpires;
     }
-      const otpCode = "123456"
+   
 
     return {
       success: true,
@@ -531,107 +578,41 @@ export class AuthService {
         token,
         refreshToken,
         tokenExpires,
-        isUserVerified,
-        isCompleteProfile,
         user: updatedUser,
-        otp: otpCode,
+      
       },
       message: 'Registration completed successfully',
     };
   }
 
-  async confirmEmail(hash: string): Promise<void> {
-    let userId: User['id'];
+ 
 
-    try {
-      const jwtData = await this.jwtService.verifyAsync<{
-        confirmEmailUserId: User['id'];
-      }>(hash, {
-        secret: this.configService.getOrThrow('auth.confirmEmailSecret', {
-          infer: true,
-        }),
-      });
+  async forgotPassword(dto: AuthForgotPasswordDto): Promise<any> {
+    if (dto.userId !== undefined && dto.userId !== null) {
+      if (typeof dto.userId === 'string' && !Types.ObjectId.isValid(dto.userId)) {
+        throw new UnprocessableEntityException({
+          success: false,
+          message: 'Your id is not valid',
+        });
+      }
+    }
 
-      userId = jwtData.confirmEmailUserId;
-    } catch {
+    
+    if (dto.email !== undefined && dto.email !== null && dto.email === '') {
       throw new UnprocessableEntityException({
-        success: HttpStatus.UNPROCESSABLE_ENTITY,
-        errors: {
-          hash: `invalidHash`,
-        },
+        success: false,
+        message: 'Your email is not valid',
       });
     }
 
-    const user = await this.usersService.findById(userId);
+    const user = dto.userId ? await this.usersService.findById(dto.userId) : await this.usersService.findByEmail(dto?.email);
 
-    if (
-      !user ||
-      user?.status?.id?.toString() !== StatusEnum.inactive.toString()
-    ) {
-      throw new NotFoundException({
-        success: HttpStatus.NOT_FOUND,
-        error: `notFound`,
-      });
-    }
-
-    user.status = {
-      id: StatusEnum.active,
-    };
-
-    await this.usersService.update(user.id, user);
-  }
-
-  async confirmNewEmail(hash: string): Promise<void> {
-    let userId: User['id'];
-    let newEmail: User['email'];
-
-    try {
-      const jwtData = await this.jwtService.verifyAsync<{
-        confirmEmailUserId: User['id'];
-        newEmail: User['email'];
-      }>(hash, {
-        secret: this.configService.getOrThrow('auth.confirmEmailSecret', {
-          infer: true,
-        }),
-      });
-
-      userId = jwtData.confirmEmailUserId;
-      newEmail = jwtData.newEmail;
-    } catch {
-      throw new UnprocessableEntityException({
-        success: false, 
-        message: 'Invalid hash',
-      });
-    }
-
-    const user = await this.usersService.findById(userId);
 
     if (!user) {
-      throw new NotFoundException({
-            success: false, 
-      
+      throw new UnprocessableEntityException({
+        success: false,
         message: 'User not found',
       });
-    }
-
-    user.email = newEmail;
-    user.status = {
-      id: StatusEnum.active,
-    };
-
-    await this.usersService.update(user.id, user);
-  }
-
-  async forgotPassword(email: string): Promise<ForgotPasswordResponseDto> {
-    const user = await this.usersService.findByEmail(email);
-    if (!user) {
-      return {
-        success: true,
-        message: 'If the email exists, a password reset OTP has been sent',
-        data: {
-          id: null,
-        },
-      };
     }
 
     const tokenExpiresIn = this.configService.getOrThrow('auth.forgotExpires', {
@@ -658,7 +639,7 @@ export class AuthService {
       // Save OTP to database
       await this.otpModel.create({
         code: otpCode,
-        email: email,
+        email: user?.email,
         userId: user.id,
         type: OtpType.FORGOT_PASSWORD,
         expiresAt: otpExpiresAt,
@@ -666,9 +647,8 @@ export class AuthService {
       });
 
       await this.mailService.forgotPassword({
-        to: email,
+        to: user?.email,
         data: {
-
           hash,
           tokenExpires,
           otp: otpCode,
@@ -680,6 +660,7 @@ export class AuthService {
         message: 'If the email exists, a password reset OTP has been sent',
         data : {
           id: user?.id,
+          email: user?.email,
       
         },
       };
@@ -695,7 +676,26 @@ export class AuthService {
   async verifyForgotPasswordOtp(
     dto: AuthForgotPasswordOtpVerifyDto,
   ): Promise<ForgotPasswordOtpVerifyResponseDto> {
-    const user = await this.usersService.findByEmail(dto.email);
+
+    if (dto.userId !== undefined && dto.userId !== null) {
+      if (typeof dto.userId === 'string' && !Types.ObjectId.isValid(dto.userId)) {
+        throw new UnprocessableEntityException({
+          success: false,
+          message: 'Your id is not valid',
+        });
+      }
+    }
+
+    // Validate email if provided
+    if (dto.email !== undefined && dto.email !== null && dto.email === '') {
+      throw new UnprocessableEntityException({
+        success: false,
+        message: 'Your email is not valid',
+      });
+    }
+
+    const user = dto.userId ? await this.usersService.findById(dto.userId) : await this.usersService.findByEmail(dto?.email);
+
     if (!user) {
       throw new UnprocessableEntityException({
         success: false,
@@ -703,16 +703,20 @@ export class AuthService {
       });
     }
 
-    // Find the latest unused OTP for this email and type
     const otpRecord = await this.otpModel
       .findOne({
-        email: dto.email.toLowerCase(),
+        email: user?.email,
+        userId: user?.id,
         code: dto.otpCode,
         type: OtpType.FORGOT_PASSWORD,
         isUsed: false,
       })
       .sort({ createdAt: -1 })
       .exec();
+
+     
+
+    
 
     if (!otpRecord) {
       throw new UnprocessableEntityException({
@@ -722,7 +726,6 @@ export class AuthService {
       });
     }
 
-    // Check if OTP is expired
     if (new Date() > otpRecord.expiresAt) {
       throw new UnprocessableEntityException({
         success: false,
@@ -736,12 +739,12 @@ export class AuthService {
     otpRecord.usedAt = new Date();
     await otpRecord.save();
 
-    // Generate reset password token/hash
+
     const tokenExpiresIn = this.configService.getOrThrow('auth.forgotExpires', {
       infer: true,
     });
 
-    const tokenExpires = Date.now() + ms(tokenExpiresIn);
+    
 
     const hash = await this.jwtService.signAsync(
       {
@@ -763,6 +766,108 @@ export class AuthService {
       
       },
     };
+  }
+
+
+  async forgotPasswordReset(dto: AuthForgotPasswordDto): Promise<any> {
+    if (dto.userId !== undefined && dto.userId !== null) {
+      if (typeof dto.userId === 'string' && !Types.ObjectId.isValid(dto.userId)) {
+        throw new UnprocessableEntityException({
+          success: false,
+          message: 'Your id is not valid',
+        });
+      }
+    }
+
+    
+    if (dto.email !== undefined && dto.email !== null && dto.email === '') {
+      throw new UnprocessableEntityException({
+        success: false,
+        message: 'Your email is not valid',
+      });
+    }
+
+    const user = dto.userId ? await this.usersService.findById(dto.userId) : await this.usersService.findByEmail(dto?.email);
+
+
+    if (!user) {
+      throw new UnprocessableEntityException({
+        success: false,
+        message: 'User not found',
+      });
+    }
+
+    const tokenExpiresIn = this.configService.getOrThrow('auth.forgotExpires', {
+      infer: true,
+    });
+
+    const tokenExpires = Date.now() + ms(tokenExpiresIn);
+
+    const hash = await this.jwtService.signAsync(
+      {
+        forgotUserId: user.id,
+      },
+      {
+        secret: this.configService.getOrThrow('auth.forgotSecret', {
+          infer: true,
+        }),
+        expiresIn: tokenExpiresIn,
+      },
+    );
+
+
+    
+    try {
+      const otpCode = '123456'; // demo
+      const otpExpiresAt = new Date(tokenExpires);
+    
+      await this.otpModel.findOneAndUpdate(
+        {
+          type: OtpType.FORGOT_PASSWORD,
+          isUsed: false,
+          expiresAt: { $gt: new Date() },
+          $or: [
+            { userId: user?.id },
+            { email: user?.email }
+          ]
+        },
+        {
+          $set: {
+            code: otpCode,
+            expiresAt: otpExpiresAt,
+            userId: user.id,
+            email: user.email,
+            resendCount: 0
+          }
+        },
+        { new: true , upsert: true }
+        
+      );
+    
+      await this.mailService.forgotPasswordReset({
+        to: user?.email,
+        data: {
+          hash,
+          tokenExpires,
+          otp: otpCode,
+        },
+      });
+    
+      return {
+        success: true,
+        message: 'If the email exists, a password reset OTP has been sent',
+        data: {
+          id: user?.id,
+          email: user?.email,
+        },
+      };
+    } catch (error) {
+      throw new UnprocessableEntityException({
+        success: false,
+        message: 'Failed to send forgot password reset email',
+      });
+    }
+    
   }
 
   async resetPassword(
@@ -868,6 +973,8 @@ export class AuthService {
         status: {
           id: StatusEnum.inactive,
         },
+        isUserVerified: true,
+        isCompanyVerified: false,
       });
     }
 
@@ -889,20 +996,14 @@ export class AuthService {
       hash,
     });
 
-    const isCompleteProfile = !!(
-      user.firstName &&
-      user.lastName &&
-      user.fullName &&
-      user.phoneNumber &&
-      user.address
-    );
+    
 
-    const isUserVerified = user.isEmailVerified || false;
+   
 
     const userWithFlags = {
       ...user,
-      isUserVerified,
-      isCompleteProfile,
+      isUserVerified: user.isUserVerified,
+      isCompanyVerified: (user as any).isCompanyVerified || false,
     };
 
     return {

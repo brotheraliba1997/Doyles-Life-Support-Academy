@@ -168,6 +168,14 @@ __decorate([
     (0, mongoose_1.Prop)({ default: true }),
     __metadata("design:type", Boolean)
 ], UserSchemaClass.prototype, "isActive", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ default: false }),
+    __metadata("design:type", Boolean)
+], UserSchemaClass.prototype, "isUserVerified", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ default: false }),
+    __metadata("design:type", Boolean)
+], UserSchemaClass.prototype, "isCompanyVerified", void 0);
 exports.UserSchemaClass = UserSchemaClass = __decorate([
     (0, mongoose_1.Schema)({
         timestamps: true,

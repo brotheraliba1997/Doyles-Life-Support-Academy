@@ -2,7 +2,7 @@ import { PartialType, ApiPropertyOptional } from '@nestjs/swagger';
 import { CreateUserDto } from './create-user.dto';
 
 import { Transform, Type } from 'class-transformer';
-import { IsEmail, IsOptional, MinLength } from 'class-validator';
+import { IsBoolean, IsEmail, IsOptional, MinLength } from 'class-validator';
 import { FileDto } from '../../files/dto/file.dto';
 import { RoleDto } from '../../roles/dto/role.dto';
 import { StatusDto } from '../../statuses/dto/status.dto';
@@ -45,4 +45,14 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   @IsOptional()
   @Type(() => StatusDto)
   status?: StatusDto;
+
+  @ApiPropertyOptional({ example: true, description: 'Is user verified', type: Boolean })
+  @IsOptional()
+  @IsBoolean()
+  isUserVerified?: boolean;
+
+  @ApiPropertyOptional({ example: true, description: 'Is company verified', type: Boolean })
+  @IsOptional()
+  @IsBoolean()
+  isCompanyVerified?: boolean;
 }

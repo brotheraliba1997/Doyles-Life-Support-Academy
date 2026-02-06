@@ -24,11 +24,6 @@ __decorate([
     __metadata("design:type", String)
 ], AuthRegisterLoginDto.prototype, "email", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)(),
-    (0, class_validator_1.MinLength)(6),
-    __metadata("design:type", String)
-], AuthRegisterLoginDto.prototype, "password", void 0);
-__decorate([
     (0, swagger_1.ApiProperty)({ example: 'John' }),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)

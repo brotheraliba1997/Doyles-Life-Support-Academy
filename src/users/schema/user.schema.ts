@@ -128,6 +128,13 @@ export class UserSchemaClass extends EntityDocumentHelper {
 
   @Prop({ default: true })
   isActive: boolean;
+
+  @Prop({ default: false })
+  isUserVerified: boolean;
+
+
+  @Prop({ default: false })
+  isCompanyVerified: boolean;
 }
 
 export const UserSchema = SchemaFactory.createForClass(UserSchemaClass);

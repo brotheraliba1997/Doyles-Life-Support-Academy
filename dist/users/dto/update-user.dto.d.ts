@@ -13,5 +13,7 @@ export declare class UpdateUserDto extends UpdateUserDto_base {
     photo?: FileDto | null;
     role?: RoleDto | null;
     status?: StatusDto;
+    isUserVerified?: boolean;
+    isCompanyVerified?: boolean;
 }
 export {};

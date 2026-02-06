@@ -18,7 +18,6 @@ const auth_service_1 = require("./auth.service");
 const swagger_1 = require("@nestjs/swagger");
 const auth_email_login_dto_1 = require("./dto/auth-email-login.dto");
 const auth_forgot_password_dto_1 = require("./dto/auth-forgot-password.dto");
-const auth_confirm_email_dto_1 = require("./dto/auth-confirm-email.dto");
 const auth_reset_password_dto_1 = require("./dto/auth-reset-password.dto");
 const auth_update_dto_1 = require("./dto/auth-update.dto");
 const passport_1 = require("@nestjs/passport");
@@ -46,7 +45,7 @@ let AuthController = class AuthController {
         return this.service.validateLogin(loginDto);
     }
     async registerStep1(createUserDto) {
-        return this.service.registerStep1(createUserDto);
+        return this.service.registerCreateUser(createUserDto);
     }
     async OTPVerify(otpVerifyDto) {
         return this.service.OTPVerify(otpVerifyDto);
@@ -57,17 +56,14 @@ let AuthController = class AuthController {
     async register(createUserDto, req) {
         return this.service.register(createUserDto, req.user);
     }
-    async confirmEmail(confirmEmailDto) {
-        return this.service.confirmEmail(confirmEmailDto.hash);
-    }
-    async confirmNewEmail(confirmEmailDto) {
-        return this.service.confirmNewEmail(confirmEmailDto.hash);
-    }
     async forgotPassword(forgotPasswordDto) {
-        return this.service.forgotPassword(forgotPasswordDto.email);
+        return this.service.forgotPassword(forgotPasswordDto);
     }
     async verifyForgotPasswordOtp(verifyOtpDto) {
         return this.service.verifyForgotPasswordOtp(verifyOtpDto);
+    }
+    async forgotPasswordReset(forgotPasswordDto) {
+        return this.service.forgotPasswordReset(forgotPasswordDto);
     }
     resetPassword(resetPasswordDto) {
         return this.service.resetPassword(resetPasswordDto.resetToken, resetPasswordDto.password);
@@ -146,22 +142,6 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "register", null);
 __decorate([
-    (0, common_1.Post)('email/confirm'),
-    (0, common_1.HttpCode)(common_1.HttpStatus.NO_CONTENT),
-    __param(0, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [auth_confirm_email_dto_1.AuthConfirmEmailDto]),
-    __metadata("design:returntype", Promise)
-], AuthController.prototype, "confirmEmail", null);
-__decorate([
-    (0, common_1.Post)('email/confirm/new'),
-    (0, common_1.HttpCode)(common_1.HttpStatus.NO_CONTENT),
-    __param(0, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [auth_confirm_email_dto_1.AuthConfirmEmailDto]),
-    __metadata("design:returntype", Promise)
-], AuthController.prototype, "confirmNewEmail", null);
-__decorate([
     (0, common_1.Post)('forgot/password'),
     (0, swagger_1.ApiOkResponse)({ type: forgot_password_response_dto_1.ForgotPasswordResponseDto }),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
@@ -179,6 +159,15 @@ __decorate([
     __metadata("design:paramtypes", [auth_forgot_password_otp_verify_dto_1.AuthForgotPasswordOtpVerifyDto]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "verifyForgotPasswordOtp", null);
+__decorate([
+    (0, common_1.Post)('forgot/password/OTP/resend'),
+    (0, swagger_1.ApiOkResponse)({ type: forgot_password_response_dto_1.ForgotPasswordResponseDto }),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [auth_forgot_password_dto_1.AuthForgotPasswordDto]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "forgotPasswordReset", null);
 __decorate([
     (0, common_1.Post)('reset/password'),
     (0, swagger_1.ApiOkResponse)({ type: reset_password_response_dto_1.ResetPasswordResponseDto }),

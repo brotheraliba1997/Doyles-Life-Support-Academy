@@ -155,4 +155,10 @@ export class User {
 
   @ApiProperty()
   isEmailVerified?: boolean;
+
+  @ApiProperty()
+  isUserVerified?: boolean;
+
+  @ApiProperty()
+  isCompanyVerified?: boolean;
 }

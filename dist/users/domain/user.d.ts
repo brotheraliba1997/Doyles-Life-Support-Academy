@@ -40,4 +40,6 @@ export declare class User {
     isDeleted: boolean;
     isActive: boolean;
     isEmailVerified?: boolean;
+    isUserVerified?: boolean;
+    isCompanyVerified?: boolean;
 }

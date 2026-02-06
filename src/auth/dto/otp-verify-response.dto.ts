@@ -2,6 +2,17 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
 
+export class OtpVerifyUserResponseDto {
+  @ApiProperty({ description: 'User ID' })
+  id: number | string;
+
+  @ApiProperty({ example: true, description: 'User verified status' })
+  isUserVerified: boolean;
+
+  @ApiProperty({ example: true, description: 'Company verified status' })
+  isCompanyVerified: boolean;
+}
+
 export class OtpVerifyResponseDataDto {
   @ApiProperty({ description: 'JWT access token' })
   token: string;
@@ -12,17 +23,11 @@ export class OtpVerifyResponseDataDto {
   @ApiProperty({ description: 'Token expiry timestamp (ms)' })
   tokenExpires: number;
 
-  @ApiProperty({ example: true, description: 'User email verified status' })
-  isUserVerified: boolean;
-
-  @ApiProperty({ example: true, description: 'Profile completion status' })
-  isCompleteProfile: boolean;
-
   @ApiProperty({ description: 'OTP code (for debugging)' })
   otp: string;
 
-  @ApiProperty({ description: 'User ID' })
-  userId: number | string;
+  @ApiProperty({ type: OtpVerifyUserResponseDto, description: 'User information' })
+  user: OtpVerifyUserResponseDto;
 }
 
 export class OtpVerifyResponseDto {

@@ -42,6 +42,8 @@ export declare class UserSchemaClass extends EntityDocumentHelper {
     deletedAt: Date;
     isDeleted: boolean;
     isActive: boolean;
+    isUserVerified: boolean;
+    isCompanyVerified: boolean;
 }
 export declare const UserSchema: import("mongoose").Schema<UserSchemaClass, import("mongoose").Model<UserSchemaClass, any, any, any, import("mongoose").Document<unknown, any, UserSchemaClass, any, {}> & UserSchemaClass & Required<{
     _id: string;

@@ -15,6 +15,7 @@ import { SessionService } from '../session/session.service';
 import { User } from '../users/domain/user';
 import { Model } from 'mongoose';
 import { OtpSchemaClass } from '../users/schema/otp.schema';
+import { UserOtpSchemaClass } from '../users/schema/isuerOtp.schema';
 import { AuthRegisterStep1Dto } from './dto/auth-register-step1.dto';
 import { AuthOtpVerifyDto } from './dto/auth-otp-verify.dto';
 import { AuthResendOtpDto } from './dto/auth-resend-otp.dto';
@@ -22,10 +23,10 @@ import { ResendOtpResponseDto } from './dto/resend-otp-response.dto';
 import { OtpVerifyResponseDto } from './dto/otp-verify-response.dto';
 import { RegisterStep1ResponseDto } from './dto/register-step1-response.dto';
 import { RegisterResponseDto } from './dto/register-response.dto';
-import { ForgotPasswordResponseDto } from './dto/forgot-password-response.dto';
 import { ResetPasswordResponseDto } from './dto/reset-password-response.dto';
 import { AuthForgotPasswordOtpVerifyDto } from './dto/auth-forgot-password-otp-verify.dto';
 import { ForgotPasswordOtpVerifyResponseDto } from './dto/forgot-password-otp-verify-response.dto';
+import { AuthForgotPasswordDto } from './dto/auth-forgot-password.dto';
 export declare class AuthService {
     private jwtService;
     private usersService;
@@ -33,17 +34,17 @@ export declare class AuthService {
     private mailService;
     private configService;
     private readonly otpModel;
-    constructor(jwtService: JwtService, usersService: UsersService, sessionService: SessionService, mailService: MailService, configService: ConfigService<AllConfigType>, otpModel: Model<OtpSchemaClass>);
+    private readonly userOtpModel;
+    constructor(jwtService: JwtService, usersService: UsersService, sessionService: SessionService, mailService: MailService, configService: ConfigService<AllConfigType>, otpModel: Model<OtpSchemaClass>, userOtpModel: Model<UserOtpSchemaClass>);
     validateLogin(loginDto: AuthEmailLoginDto): Promise<LoginResponseSuccessDto>;
     validateSocialLogin(authProvider: string, socialData: SocialInterface): Promise<LoginResponseSuccessDto>;
-    registerStep1(dto: AuthRegisterStep1Dto): Promise<RegisterStep1ResponseDto>;
+    registerCreateUser(dto: AuthRegisterStep1Dto): Promise<RegisterStep1ResponseDto>;
     OTPVerify(dto: AuthOtpVerifyDto): Promise<OtpVerifyResponseDto>;
     resendOtp(dto: AuthResendOtpDto): Promise<ResendOtpResponseDto>;
     register(dto: AuthRegisterLoginDto, jwtPayload?: JwtPayloadType): Promise<RegisterResponseDto>;
-    confirmEmail(hash: string): Promise<void>;
-    confirmNewEmail(hash: string): Promise<void>;
-    forgotPassword(email: string): Promise<ForgotPasswordResponseDto>;
+    forgotPassword(dto: AuthForgotPasswordDto): Promise<any>;
     verifyForgotPasswordOtp(dto: AuthForgotPasswordOtpVerifyDto): Promise<ForgotPasswordOtpVerifyResponseDto>;
+    forgotPasswordReset(dto: AuthForgotPasswordDto): Promise<any>;
     resetPassword(resetToken: string, password: string): Promise<ResetPasswordResponseDto>;
     firebaseLogin(firebaseToken: string): Promise<{
         success: boolean;
@@ -51,7 +52,7 @@ export declare class AuthService {
         data: {
             user: {
                 isUserVerified: boolean;
-                isCompleteProfile: boolean;
+                isCompanyVerified: any;
                 id: number | string;
                 email: string | null;
                 password?: string;

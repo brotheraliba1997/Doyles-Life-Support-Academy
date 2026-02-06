@@ -14,4 +14,6 @@ export class AuthRegisterStep1Dto {
   @IsNotEmpty()
   @MinLength(6)
   password: string;
+
+
 }

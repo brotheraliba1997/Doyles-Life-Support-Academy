@@ -21,6 +21,12 @@ __decorate([
     (0, swagger_1.ApiProperty)({ example: 'test1@example.com', type: String }),
     (0, class_transformer_1.Transform)(lower_case_transformer_1.lowerCaseTransformer),
     (0, class_validator_1.IsEmail)(),
+    (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], AuthForgotPasswordDto.prototype, "email", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: '507f1f77bcf86cd799439011', description: 'User ID' }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Object)
+], AuthForgotPasswordDto.prototype, "userId", void 0);
 //# sourceMappingURL=auth-forgot-password.dto.js.map

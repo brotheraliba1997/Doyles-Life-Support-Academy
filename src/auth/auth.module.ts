@@ -11,6 +11,7 @@ import { SessionModule } from '../session/session.module';
 import { UsersModule } from '../users/users.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { OtpSchema, OtpSchemaClass } from '../users/schema/otp.schema';
+import { UserOtpSchema, UserOtpSchemaClass } from '../users/schema/isuerOtp.schema';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { OtpSchema, OtpSchemaClass } from '../users/schema/otp.schema';
     JwtModule.register({}),
     MongooseModule.forFeature([
       { name: OtpSchemaClass.name, schema: OtpSchema },
+      { name: UserOtpSchemaClass.name, schema: UserOtpSchema },
     ]),
   ],
   controllers: [AuthController],

@@ -62,7 +62,7 @@ export class AuthController {
   async registerStep1(
     @Body() createUserDto: AuthRegisterStep1Dto,
   ): Promise<RegisterStep1ResponseDto> {
-    return this.service.registerStep1(createUserDto);
+    return this.service.registerCreateUser(createUserDto);
   }
 
 
@@ -98,21 +98,9 @@ export class AuthController {
     return this.service.register(createUserDto, req.user);
   }
 
-  @Post('email/confirm')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async confirmEmail(
-    @Body() confirmEmailDto: AuthConfirmEmailDto,
-  ): Promise<void> {
-    return this.service.confirmEmail(confirmEmailDto.hash);
-  }
 
-  @Post('email/confirm/new')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async confirmNewEmail(
-    @Body() confirmEmailDto: AuthConfirmEmailDto,
-  ): Promise<void> {
-    return this.service.confirmNewEmail(confirmEmailDto.hash);
-  }
+
+
 
   
 
@@ -122,8 +110,11 @@ export class AuthController {
   async forgotPassword(
     @Body() forgotPasswordDto: AuthForgotPasswordDto,
   ): Promise<ForgotPasswordResponseDto> {
-    return this.service.forgotPassword(forgotPasswordDto.email);
+    return this.service.forgotPassword(forgotPasswordDto);
   }
+
+
+
 
   @Post('forgot/password/verify-otp')
   @ApiOkResponse({ type: ForgotPasswordOtpVerifyResponseDto })
@@ -132,6 +123,16 @@ export class AuthController {
     @Body() verifyOtpDto: AuthForgotPasswordOtpVerifyDto,
   ): Promise<ForgotPasswordOtpVerifyResponseDto> {
     return this.service.verifyForgotPasswordOtp(verifyOtpDto);
+  }
+
+
+  @Post('forgot/password/OTP/resend')
+  @ApiOkResponse({ type: ForgotPasswordResponseDto })
+  @HttpCode(HttpStatus.OK)
+  async forgotPasswordReset(
+    @Body() forgotPasswordDto: AuthForgotPasswordDto,
+  ): Promise<ForgotPasswordResponseDto> {
+    return this.service.forgotPasswordReset(forgotPasswordDto);
   }
 
   @Post('reset/password')

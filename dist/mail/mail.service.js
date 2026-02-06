@@ -93,6 +93,40 @@ let MailService = class MailService {
             },
         });
     }
+    async forgotPasswordReset(mailData) {
+        const i18n = nestjs_i18n_1.I18nContext.current();
+        let resetPasswordTitle;
+        let text1;
+        let text2;
+        let text3;
+        let text4;
+        if (i18n) {
+            [resetPasswordTitle, text1, text2, text3, text4] = await Promise.all([
+                i18n.t('common.resetPassword'),
+                i18n.t('reset-password.text1'),
+                i18n.t('reset-password.text2'),
+                i18n.t('reset-password.text3'),
+                i18n.t('reset-password.text4'),
+            ]);
+        }
+        await this.mailerService.sendMail({
+            to: mailData.to,
+            subject: resetPasswordTitle,
+            text: `${resetPasswordTitle} - OTP: ${mailData.data.otp}`,
+            templatePath: path_1.default.join(this.configService.getOrThrow('app.workingDirectory', { infer: true }), 'src', 'mail', 'mail-templates', 'reset-password.hbs'),
+            context: {
+                title: resetPasswordTitle,
+                app_name: this.configService.get('app.name', {
+                    infer: true,
+                }),
+                text1,
+                text2,
+                text3,
+                text4,
+                otp: mailData.data.otp,
+            },
+        });
+    }
     async confirmNewEmail(mailData) {
         const i18n = nestjs_i18n_1.I18nContext.current();
         let emailConfirmTitle;

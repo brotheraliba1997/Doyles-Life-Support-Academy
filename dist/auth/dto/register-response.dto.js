@@ -27,23 +27,11 @@ __decorate([
     __metadata("design:type", Number)
 ], RegisterDataDto.prototype, "tokenExpires", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: true, description: 'Whether the user email is verified' }),
-    __metadata("design:type", Boolean)
-], RegisterDataDto.prototype, "isUserVerified", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ example: true, description: 'Whether the user profile is complete' }),
-    __metadata("design:type", Boolean)
-], RegisterDataDto.prototype, "isCompleteProfile", void 0);
-__decorate([
     (0, swagger_1.ApiProperty)({
         type: () => user_1.User,
     }),
     __metadata("design:type", user_1.User)
 ], RegisterDataDto.prototype, "user", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ example: '123456', description: 'OTP code' }),
-    __metadata("design:type", String)
-], RegisterDataDto.prototype, "otp", void 0);
 class RegisterResponseDto {
 }
 exports.RegisterResponseDto = RegisterResponseDto;

@@ -11,19 +11,14 @@ class RegisterDataDto {
   @ApiProperty({ example: 1734567890000, description: 'Token expiry timestamp' })
   tokenExpires: number;
 
-  @ApiProperty({ example: true, description: 'Whether the user email is verified' })
-  isUserVerified: boolean;
 
-  @ApiProperty({ example: true, description: 'Whether the user profile is complete' })
-  isCompleteProfile: boolean;
 
   @ApiProperty({
     type: () => User,
   })
   user: User;
 
-  @ApiProperty({ example: '123456', description: 'OTP code' })
-  otp: string;
+
 }
 
 export class RegisterResponseDto {

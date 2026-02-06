@@ -1,6 +1,12 @@
-export declare class ResendOtpResponseDataDto {
+export declare class ResendOtpUserResponseDto {
+    id: number | string;
     isUserVerified: boolean;
-    isCompleteProfile: boolean;
+    isCompanyVerified: boolean;
+}
+export declare class ResendOtpResponseDataDto {
+    otp: string;
+    otpExpiresAt: Date;
+    user: ResendOtpUserResponseDto;
 }
 export declare class ResendOtpResponseDto {
     success: boolean;

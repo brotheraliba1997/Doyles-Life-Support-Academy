@@ -1,7 +1,6 @@
 import { AuthService } from './auth.service';
 import { AuthEmailLoginDto } from './dto/auth-email-login.dto';
 import { AuthForgotPasswordDto } from './dto/auth-forgot-password.dto';
-import { AuthConfirmEmailDto } from './dto/auth-confirm-email.dto';
 import { AuthResetPasswordDto } from './dto/auth-reset-password.dto';
 import { AuthUpdateDto } from './dto/auth-update.dto';
 import { AuthRegisterLoginDto } from './dto/auth-register-login.dto';
@@ -32,10 +31,9 @@ export declare class AuthController {
     register(createUserDto: AuthRegisterLoginDto, req: {
         user: JwtPayloadType;
     }): Promise<RegisterResponseDto>;
-    confirmEmail(confirmEmailDto: AuthConfirmEmailDto): Promise<void>;
-    confirmNewEmail(confirmEmailDto: AuthConfirmEmailDto): Promise<void>;
     forgotPassword(forgotPasswordDto: AuthForgotPasswordDto): Promise<ForgotPasswordResponseDto>;
     verifyForgotPasswordOtp(verifyOtpDto: AuthForgotPasswordOtpVerifyDto): Promise<ForgotPasswordOtpVerifyResponseDto>;
+    forgotPasswordReset(forgotPasswordDto: AuthForgotPasswordDto): Promise<ForgotPasswordResponseDto>;
     resetPassword(resetPasswordDto: AuthResetPasswordDto): Promise<ResetPasswordResponseDto>;
     firebaseLogin(dto: FirebaseLoginDto): Promise<{
         success: boolean;
@@ -43,7 +41,7 @@ export declare class AuthController {
         data: {
             user: {
                 isUserVerified: boolean;
-                isCompleteProfile: boolean;
+                isCompanyVerified: any;
                 id: number | string;
                 email: string | null;
                 password?: string;

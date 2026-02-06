@@ -33,4 +33,6 @@ export declare class CreateUserDto {
     currency?: string;
     deviceToken?: string;
     deviceType?: string;
+    isUserVerified?: boolean;
+    isCompanyVerified?: boolean;
 }

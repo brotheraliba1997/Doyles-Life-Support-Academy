@@ -107,6 +107,51 @@ export class MailService {
     });
   }
 
+
+  async forgotPasswordReset(
+    mailData: MailData<{ hash: string; tokenExpires: number; otp: string }>,
+  ): Promise<void> {
+    const i18n = I18nContext.current();
+    let resetPasswordTitle: MaybeType<string>;
+    let text1: MaybeType<string>;
+    let text2: MaybeType<string>;
+    let text3: MaybeType<string>;
+    let text4: MaybeType<string>;
+
+    if (i18n) {
+      [resetPasswordTitle, text1, text2, text3, text4] = await Promise.all([
+        i18n.t('common.resetPassword'),
+        i18n.t('reset-password.text1'),
+        i18n.t('reset-password.text2'),
+        i18n.t('reset-password.text3'),
+        i18n.t('reset-password.text4'),
+      ]);
+    }
+
+    await this.mailerService.sendMail({
+      to: mailData.to,
+      subject: resetPasswordTitle,
+      text: `${resetPasswordTitle} - OTP: ${mailData.data.otp}`,
+      templatePath: path.join(this.configService.getOrThrow('app.workingDirectory', {infer: true}),
+        'src',
+        'mail',
+        'mail-templates',
+        'reset-password.hbs',
+      ),
+      context: {
+        title: resetPasswordTitle,
+        app_name: this.configService.get('app.name', {
+          infer: true,
+        }),
+        text1,
+        text2,
+        text3,
+        text4,
+        otp: mailData.data.otp,
+      },
+    });
+  }
+
   async confirmNewEmail(mailData: MailData<{ hash: string }>): Promise<void> {
     const i18n = I18nContext.current();
     let emailConfirmTitle: MaybeType<string>;

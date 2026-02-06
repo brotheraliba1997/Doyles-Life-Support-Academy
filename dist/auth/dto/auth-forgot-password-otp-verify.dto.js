@@ -16,13 +16,21 @@ class AuthForgotPasswordOtpVerifyDto {
 }
 exports.AuthForgotPasswordOtpVerifyDto = AuthForgotPasswordOtpVerifyDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'user@example.com', description: 'User email address' }),
+    (0, swagger_1.ApiProperty)({ example: 'hamzaali1997.h@gmail.com', description: 'User email address' }),
     (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.IsEmail)(),
+    (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], AuthForgotPasswordOtpVerifyDto.prototype, "email", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: '1234', description: 'OTP code received via email' }),
+    (0, swagger_1.ApiProperty)({ example: '507f1f77bcf86cd799439011', description: 'User ID' }),
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Object)
+], AuthForgotPasswordOtpVerifyDto.prototype, "userId", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: '123456', description: 'OTP code received via email' }),
     (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)

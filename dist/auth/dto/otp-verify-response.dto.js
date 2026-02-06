@@ -9,10 +9,25 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.OtpVerifyResponseDto = exports.OtpVerifyResponseDataDto = void 0;
+exports.OtpVerifyResponseDto = exports.OtpVerifyResponseDataDto = exports.OtpVerifyUserResponseDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 const class_transformer_1 = require("class-transformer");
+class OtpVerifyUserResponseDto {
+}
+exports.OtpVerifyUserResponseDto = OtpVerifyUserResponseDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'User ID' }),
+    __metadata("design:type", Object)
+], OtpVerifyUserResponseDto.prototype, "id", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: true, description: 'User verified status' }),
+    __metadata("design:type", Boolean)
+], OtpVerifyUserResponseDto.prototype, "isUserVerified", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: true, description: 'Company verified status' }),
+    __metadata("design:type", Boolean)
+], OtpVerifyUserResponseDto.prototype, "isCompanyVerified", void 0);
 class OtpVerifyResponseDataDto {
 }
 exports.OtpVerifyResponseDataDto = OtpVerifyResponseDataDto;
@@ -29,21 +44,13 @@ __decorate([
     __metadata("design:type", Number)
 ], OtpVerifyResponseDataDto.prototype, "tokenExpires", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: true, description: 'User email verified status' }),
-    __metadata("design:type", Boolean)
-], OtpVerifyResponseDataDto.prototype, "isUserVerified", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ example: true, description: 'Profile completion status' }),
-    __metadata("design:type", Boolean)
-], OtpVerifyResponseDataDto.prototype, "isCompleteProfile", void 0);
-__decorate([
     (0, swagger_1.ApiProperty)({ description: 'OTP code (for debugging)' }),
     __metadata("design:type", String)
 ], OtpVerifyResponseDataDto.prototype, "otp", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'User ID' }),
-    __metadata("design:type", Object)
-], OtpVerifyResponseDataDto.prototype, "userId", void 0);
+    (0, swagger_1.ApiProperty)({ type: OtpVerifyUserResponseDto, description: 'User information' }),
+    __metadata("design:type", OtpVerifyUserResponseDto)
+], OtpVerifyResponseDataDto.prototype, "user", void 0);
 class OtpVerifyResponseDto {
 }
 exports.OtpVerifyResponseDto = OtpVerifyResponseDto;

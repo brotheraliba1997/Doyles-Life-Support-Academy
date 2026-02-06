@@ -9,21 +9,40 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ResendOtpResponseDto = exports.ResendOtpResponseDataDto = void 0;
+exports.ResendOtpResponseDto = exports.ResendOtpResponseDataDto = exports.ResendOtpUserResponseDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 const class_transformer_1 = require("class-transformer");
+class ResendOtpUserResponseDto {
+}
+exports.ResendOtpUserResponseDto = ResendOtpUserResponseDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'User ID' }),
+    __metadata("design:type", Object)
+], ResendOtpUserResponseDto.prototype, "id", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: true, description: 'User verified status' }),
+    __metadata("design:type", Boolean)
+], ResendOtpUserResponseDto.prototype, "isUserVerified", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: true, description: 'Company verified status' }),
+    __metadata("design:type", Boolean)
+], ResendOtpUserResponseDto.prototype, "isCompanyVerified", void 0);
 class ResendOtpResponseDataDto {
 }
 exports.ResendOtpResponseDataDto = ResendOtpResponseDataDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: false, description: 'User verification status' }),
-    __metadata("design:type", Boolean)
-], ResendOtpResponseDataDto.prototype, "isUserVerified", void 0);
+    (0, swagger_1.ApiProperty)({ example: '123456', description: 'OTP code' }),
+    __metadata("design:type", String)
+], ResendOtpResponseDataDto.prototype, "otp", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: false, description: 'Profile completion status' }),
-    __metadata("design:type", Boolean)
-], ResendOtpResponseDataDto.prototype, "isCompleteProfile", void 0);
+    (0, swagger_1.ApiProperty)({ example: '2026-02-06T10:00:00.000Z', description: 'OTP expires at' }),
+    __metadata("design:type", Date)
+], ResendOtpResponseDataDto.prototype, "otpExpiresAt", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: ResendOtpUserResponseDto, description: 'User information' }),
+    __metadata("design:type", ResendOtpUserResponseDto)
+], ResendOtpResponseDataDto.prototype, "user", void 0);
 class ResendOtpResponseDto {
 }
 exports.ResendOtpResponseDto = ResendOtpResponseDto;

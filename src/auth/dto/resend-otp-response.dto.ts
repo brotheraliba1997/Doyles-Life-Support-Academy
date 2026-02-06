@@ -1,16 +1,31 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { User } from '../../users/domain/user';
 import { IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
 
+export class ResendOtpUserResponseDto {
+  @ApiProperty({ description: 'User ID' })
+  id: number | string;
 
-
-export class ResendOtpResponseDataDto {
-  @ApiProperty({ example: false, description: 'User verification status' })
+  @ApiProperty({ example: true, description: 'User verified status' })
   isUserVerified: boolean;
 
-  @ApiProperty({ example: false, description: 'Profile completion status' })
-  isCompleteProfile: boolean;
+  @ApiProperty({ example: true, description: 'Company verified status' })
+  isCompanyVerified: boolean;
+}
+
+export class ResendOtpResponseDataDto {
+
+
+  @ApiProperty({ example: '123456', description: 'OTP code' })
+  otp: string;
+
+  @ApiProperty({ example: '2026-02-06T10:00:00.000Z', description: 'OTP expires at' })
+  otpExpiresAt: Date;
+
+
+
+  @ApiProperty({ type: ResendOtpUserResponseDto, description: 'User information' })
+  user: ResendOtpUserResponseDto;
 }
 
 export class ResendOtpResponseDto {

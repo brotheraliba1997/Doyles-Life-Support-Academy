@@ -8,6 +8,7 @@ import {
   IsString,
   IsNumber,
   IsDateString,
+  IsBoolean,
 } from 'class-validator';
 import { FileDto } from '../../files/dto/file.dto';
 import { RoleDto } from '../../roles/dto/role.dto';
@@ -170,4 +171,14 @@ export class CreateUserDto {
   @IsOptional()
   @IsString()
   deviceType?: string;
+
+  @ApiPropertyOptional({ example: true, description: 'Is user verified', type: Boolean })
+  @IsOptional()
+  @IsBoolean()
+  isUserVerified?: boolean;
+
+  @ApiPropertyOptional({ example: true, description: 'Is company verified', type: Boolean })
+  @IsOptional()
+  @IsBoolean()
+  isCompanyVerified?: boolean;
 }
