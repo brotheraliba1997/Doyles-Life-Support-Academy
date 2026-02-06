@@ -108,6 +108,13 @@ export class AuthService {
       hash,
     });
 
+    const userOtp = await this.userOtpModel.findOne({
+      userId: new Types.ObjectId(user.id as string),
+      type: UserOtpType.EMAIL_VERIFICATION,
+      isUsed: false,
+      email: user.email,
+    });
+
     const { token, refreshToken, tokenExpires } = await this.getTokensData({
       id: user.id,
       role: user.role,
@@ -117,7 +124,7 @@ export class AuthService {
 
     const userWithFlags = {
       ...user,
-      isUserVerified: user.isUserVerified,
+      isUserVerified: userOtp ? false : user.isUserVerified,
       isCompanyVerified: (user as any).isCompanyVerified || false,
     };
 
@@ -283,6 +290,8 @@ export class AuthService {
      
     };
   }
+
+  
   async OTPVerify(dto: AuthOtpVerifyDto): Promise<OtpVerifyResponseDto> {
     // Validate MongoDB ObjectId format
     if (typeof dto.userId === 'string' && !Types.ObjectId.isValid(dto.userId)) {
@@ -306,36 +315,32 @@ export class AuthService {
                     dto.type === 'forgot' ? UserOtpType.FORGOT_PASSWORD : 
                     UserOtpType.EMAIL_VERIFICATION;
 
-    // Find OTP in database
-    const userOtp = await this.userOtpModel.findOne({
-      userId: new Types.ObjectId(userFindOutById.id as string),
-      code: dto.otpCode,
-      type: otpType,
-      isUsed: false,
-    });
+    // Find and update OTP atomically to prevent race conditions
+    const userOtp = await this.userOtpModel.findOneAndUpdate(
+      {
+        userId: new Types.ObjectId(userFindOutById.id as string),
+        code: dto.otpCode,
+        type: otpType,
+        isUsed: false,
+        expiresAt: { $gt: new Date() }, 
+      },
+      {
+        $set: {
+          isUsed: true,
+          usedAt: new Date(),
+        },
+      },
+      { new: true }
+    );
 
     if (!userOtp) {
       throw new UnprocessableEntityException({
         success: false,
-        message: 'Invalid OTP',
+        message: 'Invalid or expired OTP',
       });
     }
-
-    // Check if OTP is expired
-    if (userOtp.expiresAt < new Date()) {
-      throw new UnprocessableEntityException({
-        success: false,
-        message: 'OTP has expired',
-      });
-    }
-
 
     await this.usersService.updateEmailVerified(userFindOutById.id, true);
-
-    if(!userOtp.isUsed) {
-        userOtp.isUsed = true;  
-        await userOtp.save();
-    }
 
     // Update user verification status
     const updatedUser = await this.usersService.update(userFindOutById.id, {
@@ -921,10 +926,13 @@ export class AuthService {
 
 
   async firebaseLogin(firebaseToken: string) {
+
+    console.log("firebaseToken", firebaseToken);
     let decodedToken;
   
     try {
-      decodedToken = await admin.auth().verifyIdToken(firebaseToken);
+      decodedToken = await admin.auth().verifyIdToken("https://securetoken.google.com/life-support-app-e25ce");
+      console.log("decodedToken", decodedToken);
     } catch {
       throw new UnprocessableEntityException({
         success: false,

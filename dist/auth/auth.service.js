@@ -79,6 +79,12 @@ let AuthService = class AuthService {
             user,
             hash,
         });
+        const userOtp = await this.userOtpModel.findOne({
+            userId: new mongoose_2.Types.ObjectId(user.id),
+            type: isuerOtp_schema_1.UserOtpType.EMAIL_VERIFICATION,
+            isUsed: false,
+            email: user.email,
+        });
         const { token, refreshToken, tokenExpires } = await this.getTokensData({
             id: user.id,
             role: user.role,
@@ -87,7 +93,7 @@ let AuthService = class AuthService {
         });
         const userWithFlags = {
             ...user,
-            isUserVerified: user.isUserVerified,
+            isUserVerified: userOtp ? false : user.isUserVerified,
             isCompanyVerified: user.isCompanyVerified || false,
         };
         return {
@@ -246,29 +252,25 @@ let AuthService = class AuthService {
         const otpType = dto.type === 'register' ? isuerOtp_schema_1.UserOtpType.REGISTER :
             dto.type === 'forgot' ? isuerOtp_schema_1.UserOtpType.FORGOT_PASSWORD :
                 isuerOtp_schema_1.UserOtpType.EMAIL_VERIFICATION;
-        const userOtp = await this.userOtpModel.findOne({
+        const userOtp = await this.userOtpModel.findOneAndUpdate({
             userId: new mongoose_2.Types.ObjectId(userFindOutById.id),
             code: dto.otpCode,
             type: otpType,
             isUsed: false,
-        });
+            expiresAt: { $gt: new Date() },
+        }, {
+            $set: {
+                isUsed: true,
+                usedAt: new Date(),
+            },
+        }, { new: true });
         if (!userOtp) {
             throw new common_1.UnprocessableEntityException({
                 success: false,
-                message: 'Invalid OTP',
-            });
-        }
-        if (userOtp.expiresAt < new Date()) {
-            throw new common_1.UnprocessableEntityException({
-                success: false,
-                message: 'OTP has expired',
+                message: 'Invalid or expired OTP',
             });
         }
         await this.usersService.updateEmailVerified(userFindOutById.id, true);
-        if (!userOtp.isUsed) {
-            userOtp.isUsed = true;
-            await userOtp.save();
-        }
         const updatedUser = await this.usersService.update(userFindOutById.id, {
             isUserVerified: true,
         });
@@ -715,9 +717,11 @@ let AuthService = class AuthService {
         };
     }
     async firebaseLogin(firebaseToken) {
+        console.log("firebaseToken", firebaseToken);
         let decodedToken;
         try {
-            decodedToken = await firebase_admin_1.admin.auth().verifyIdToken(firebaseToken);
+            decodedToken = await firebase_admin_1.admin.auth().verifyIdToken("https://securetoken.google.com/life-support-app-e25ce");
+            console.log("decodedToken", decodedToken);
         }
         catch {
             throw new common_1.UnprocessableEntityException({
