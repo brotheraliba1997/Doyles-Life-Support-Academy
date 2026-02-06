@@ -715,11 +715,10 @@ let AuthService = class AuthService {
             message: 'Password reset successfully',
         };
     }
-    async firebaseLogin(firebaseToken) {
+    async firebaseLogin(firebaseToken, provider) {
         let decodedToken;
         try {
             decodedToken = this.jwtService.decode(firebaseToken);
-            console.log("decodedToken", decodedToken);
             if (!decodedToken) {
                 throw new common_1.UnprocessableEntityException({
                     success: false,
@@ -736,7 +735,6 @@ let AuthService = class AuthService {
         const uid = decodedToken.uid || decodedToken.sub || decodedToken.user_id;
         const email = decodedToken.email;
         const name = decodedToken.name;
-        const sign_in_provider = decodedToken.firebase?.sign_in_provider || decodedToken.firebase_sign_in_provider || 'unknown';
         if (!uid) {
             throw new common_1.UnprocessableEntityException({
                 success: false,
@@ -756,18 +754,8 @@ let AuthService = class AuthService {
             const lastName = nameParts.slice(1).join(' ') || null;
             const lat = decodedToken.latitude || null;
             const long = decodedToken.longitude || null;
-            let provider = sign_in_provider;
-            if (provider === 'google') {
-                provider = auth_providers_enum_1.AuthProvidersEnum.google;
-            }
-            else if (provider === 'facebook') {
-                provider = auth_providers_enum_1.AuthProvidersEnum.facebook;
-            }
-            else if (provider === 'apple') {
-                provider = auth_providers_enum_1.AuthProvidersEnum.apple;
-            }
             user = await this.usersService.create({
-                provider: sign_in_provider,
+                provider: provider,
                 socialId: uid,
                 email: email,
                 firstName: firstName,

@@ -21,4 +21,10 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], FirebaseLoginDto.prototype, "token", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'google| apple' }),
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], FirebaseLoginDto.prototype, "provider", void 0);
 //# sourceMappingURL=FirebaseLogin.dto.js.map

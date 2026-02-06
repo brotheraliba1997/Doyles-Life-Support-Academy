@@ -6,4 +6,10 @@ export class FirebaseLoginDto {
   @IsNotEmpty()
   @IsString()
   token: string;
+
+
+  @ApiProperty({ example: 'google| apple' })
+  @IsNotEmpty()
+  @IsString()
+  provider: 'google'  | 'apple';
 }

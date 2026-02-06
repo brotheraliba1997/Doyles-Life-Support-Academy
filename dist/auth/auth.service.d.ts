@@ -46,7 +46,7 @@ export declare class AuthService {
     verifyForgotPasswordOtp(dto: AuthForgotPasswordOtpVerifyDto): Promise<ForgotPasswordOtpVerifyResponseDto>;
     forgotPasswordReset(dto: AuthForgotPasswordDto): Promise<any>;
     resetPassword(resetToken: string, password: string): Promise<ResetPasswordResponseDto>;
-    firebaseLogin(firebaseToken: string): Promise<{
+    firebaseLogin(firebaseToken: string, provider: string): Promise<{
         success: boolean;
         message: string;
         data: {

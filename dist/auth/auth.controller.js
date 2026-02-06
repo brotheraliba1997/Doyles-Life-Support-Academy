@@ -69,7 +69,7 @@ let AuthController = class AuthController {
         return this.service.resetPassword(resetPasswordDto.resetToken, resetPasswordDto.password);
     }
     async firebaseLogin(dto) {
-        return this.service.firebaseLogin(dto.token);
+        return this.service.firebaseLogin(dto.token, dto.provider);
     }
     refresh(request) {
         return this.service.refreshToken({

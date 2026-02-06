@@ -148,7 +148,7 @@ export class AuthController {
 
   @Post('social/login')
 async firebaseLogin(@Body() dto: FirebaseLoginDto) {
-  return this.service.firebaseLogin(dto.token);
+  return this.service.firebaseLogin(dto.token, dto.provider);
 }
 
 

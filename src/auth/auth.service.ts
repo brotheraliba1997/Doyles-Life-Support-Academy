@@ -925,19 +925,10 @@ export class AuthService {
   }
 
 
-  async firebaseLogin(firebaseToken: string) {
-
-   
-
-   
-
+  async firebaseLogin(firebaseToken: string, provider: string) {
     let decodedToken: any;
-  
     try {
-      // Decode Firebase token using JWT (without verification)
       decodedToken = this.jwtService.decode(firebaseToken);
-
-      console.log("decodedToken", decodedToken);
       if (!decodedToken) {
         throw new UnprocessableEntityException({
           success: false,
@@ -957,7 +948,7 @@ export class AuthService {
     const uid = decodedToken.uid || decodedToken.sub || decodedToken.user_id;
     const email = decodedToken.email;
     const name = decodedToken.name;
-    const sign_in_provider = decodedToken.firebase?.sign_in_provider || decodedToken.firebase_sign_in_provider || 'unknown';
+  
 
     if (!uid) {
       throw new UnprocessableEntityException({
@@ -982,17 +973,10 @@ export class AuthService {
       const lastName = nameParts.slice(1).join(' ') || null;
       const lat = decodedToken.latitude || null;
       const long = decodedToken.longitude || null;
-      let provider = sign_in_provider;
-      if(provider === 'google') {
-        provider = AuthProvidersEnum.google;
-      } else if(provider === 'facebook') {
-        provider = AuthProvidersEnum.facebook;
-      } else if(provider === 'apple') {
-        provider = AuthProvidersEnum.apple;
-      }
+    
 
       user = await this.usersService.create({
-        provider: sign_in_provider,  
+        provider: provider,  
         socialId: uid,               
         email: email,
         firstName: firstName,
