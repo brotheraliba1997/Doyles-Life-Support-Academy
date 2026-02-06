@@ -717,8 +717,10 @@ let AuthService = class AuthService {
     }
     async firebaseLogin(firebaseToken, provider) {
         let decodedToken;
+        let user;
         try {
             decodedToken = this.jwtService.decode(firebaseToken);
+            console.log("decodedToken", decodedToken);
             if (!decodedToken) {
                 throw new common_1.UnprocessableEntityException({
                     success: false,
@@ -747,7 +749,10 @@ let AuthService = class AuthService {
                 message: 'Email not found in Firebase token',
             });
         }
-        let user = await this.usersService.findByFirebaseUid(uid);
+        user = await this.usersService.findByEmail(email);
+        if (!user) {
+            user = await this.usersService.findByFirebaseUid(uid);
+        }
         if (!user) {
             const nameParts = name ? name.split(' ') : [];
             const firstName = nameParts[0] || null;
@@ -793,19 +798,17 @@ let AuthService = class AuthService {
             sessionId: session.id,
             hash,
         });
-        const userWithFlags = {
-            ...user,
-            isUserVerified: user.isUserVerified,
-            isCompanyVerified: user.isCompanyVerified || false,
-        };
         return {
             success: true,
             message: 'Login successful',
             data: {
-                user: userWithFlags,
+                id: user.id,
+                email: user.email,
                 token,
                 refreshToken,
                 tokenExpires,
+                isUserVerified: user.isUserVerified,
+                isCompanyVerified: user.isCompanyVerified || false,
             },
         };
     }

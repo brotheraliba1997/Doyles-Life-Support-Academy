@@ -927,8 +927,14 @@ export class AuthService {
 
   async firebaseLogin(firebaseToken: string, provider: string) {
     let decodedToken: any;
+    let user: any
     try {
       decodedToken = this.jwtService.decode(firebaseToken);
+
+  
+       
+
+      console.log("decodedToken", decodedToken);
       if (!decodedToken) {
         throw new UnprocessableEntityException({
           success: false,
@@ -963,21 +969,25 @@ export class AuthService {
         message: 'Email not found in Firebase token',
       });
     }
-  
-    let user = await this.usersService.findByFirebaseUid(uid);
 
+    // Pehle email se check karo - agar user already database mein hai toh wohi use karo
+    user = await this.usersService.findByEmail(email);
+
+    // Email se nahi mila toh Firebase UID se dhoondo
     if (!user) {
-  
+      user = await this.usersService.findByFirebaseUid(uid);
+    }
+
+    // Dono se nahi mila toh naya user create karo
+    if (!user) {
       const nameParts = name ? name.split(' ') : [];
       const firstName = nameParts[0] || null;
       const lastName = nameParts.slice(1).join(' ') || null;
       const lat = decodedToken.latitude || null;
       const long = decodedToken.longitude || null;
-    
-
       user = await this.usersService.create({
-        provider: provider,  
-        socialId: uid,               
+        provider: provider,
+        socialId: uid,
         email: email,
         firstName: firstName,
         lastName: lastName,
@@ -1001,7 +1011,7 @@ export class AuthService {
       });
     }
 
-    
+    // Ab jo bhi user hai (already exist ya naya) usi ke liye session + token
     const hash = crypto
       .createHash('sha256')
       .update(randomStringGenerator())
@@ -1019,24 +1029,17 @@ export class AuthService {
       hash,
     });
 
-    
-
-   
-
-    const userWithFlags = {
-      ...user,
-      isUserVerified: user.isUserVerified,
-      isCompanyVerified: (user as any).isCompanyVerified || false,
-    };
-
     return {
       success: true,
       message: 'Login successful',
       data: {
-        user: userWithFlags,
+        id: user.id,
+        email: user.email,
         token,
         refreshToken,
         tokenExpires,
+        isUserVerified: user.isUserVerified,
+        isCompanyVerified: (user as any).isCompanyVerified || false,
       },
     };
   }
