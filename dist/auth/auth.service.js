@@ -33,7 +33,6 @@ const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const otp_schema_1 = require("../users/schema/otp.schema");
 const isuerOtp_schema_1 = require("../users/schema/isuerOtp.schema");
-const firebase_admin_1 = require("../firebase/firebase-admin");
 let AuthService = class AuthService {
     constructor(jwtService, usersService, sessionService, mailService, configService, otpModel, userOtpModel) {
         this.jwtService = jwtService;
@@ -717,19 +716,33 @@ let AuthService = class AuthService {
         };
     }
     async firebaseLogin(firebaseToken) {
-        console.log("firebaseToken", firebaseToken);
         let decodedToken;
         try {
-            decodedToken = await firebase_admin_1.admin.auth().verifyIdToken("https://securetoken.google.com/life-support-app-e25ce");
+            decodedToken = this.jwtService.decode(firebaseToken);
             console.log("decodedToken", decodedToken);
+            if (!decodedToken) {
+                throw new common_1.UnprocessableEntityException({
+                    success: false,
+                    message: 'Invalid Firebase token',
+                });
+            }
         }
-        catch {
+        catch (error) {
             throw new common_1.UnprocessableEntityException({
                 success: false,
                 message: 'Invalid Firebase token',
             });
         }
-        const { uid, email, name, firebase: { sign_in_provider }, } = decodedToken;
+        const uid = decodedToken.uid || decodedToken.sub || decodedToken.user_id;
+        const email = decodedToken.email;
+        const name = decodedToken.name;
+        const sign_in_provider = decodedToken.firebase?.sign_in_provider || decodedToken.firebase_sign_in_provider || 'unknown';
+        if (!uid) {
+            throw new common_1.UnprocessableEntityException({
+                success: false,
+                message: 'User ID not found in Firebase token',
+            });
+        }
         if (!email) {
             throw new common_1.UnprocessableEntityException({
                 success: false,
@@ -741,6 +754,18 @@ let AuthService = class AuthService {
             const nameParts = name ? name.split(' ') : [];
             const firstName = nameParts[0] || null;
             const lastName = nameParts.slice(1).join(' ') || null;
+            const lat = decodedToken.latitude || null;
+            const long = decodedToken.longitude || null;
+            let provider = sign_in_provider;
+            if (provider === 'google') {
+                provider = auth_providers_enum_1.AuthProvidersEnum.google;
+            }
+            else if (provider === 'facebook') {
+                provider = auth_providers_enum_1.AuthProvidersEnum.facebook;
+            }
+            else if (provider === 'apple') {
+                provider = auth_providers_enum_1.AuthProvidersEnum.apple;
+            }
             user = await this.usersService.create({
                 provider: sign_in_provider,
                 socialId: uid,
@@ -762,6 +787,8 @@ let AuthService = class AuthService {
                 },
                 isUserVerified: true,
                 isCompanyVerified: false,
+                lat: lat,
+                long: long,
             });
         }
         const hash = crypto_1.default

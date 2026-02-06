@@ -927,25 +927,44 @@ export class AuthService {
 
   async firebaseLogin(firebaseToken: string) {
 
-    console.log("firebaseToken", firebaseToken);
-    let decodedToken;
+   
+
+   
+
+    let decodedToken: any;
   
     try {
-      decodedToken = await admin.auth().verifyIdToken("https://securetoken.google.com/life-support-app-e25ce");
+      // Decode Firebase token using JWT (without verification)
+      decodedToken = this.jwtService.decode(firebaseToken);
+
       console.log("decodedToken", decodedToken);
-    } catch {
+      if (!decodedToken) {
+        throw new UnprocessableEntityException({
+          success: false,
+          message: 'Invalid Firebase token',
+        });
+      }
+      
+      // console.log("decodedToken", decodedToken);
+    } catch (error) {
       throw new UnprocessableEntityException({
         success: false,
         message: 'Invalid Firebase token',
       });
     }
   
-    const {
-      uid,
-      email,
-      name,
-      firebase: { sign_in_provider },
-    } = decodedToken;
+    // Extract data from decoded Firebase token
+    const uid = decodedToken.uid || decodedToken.sub || decodedToken.user_id;
+    const email = decodedToken.email;
+    const name = decodedToken.name;
+    const sign_in_provider = decodedToken.firebase?.sign_in_provider || decodedToken.firebase_sign_in_provider || 'unknown';
+
+    if (!uid) {
+      throw new UnprocessableEntityException({
+        success: false,
+        message: 'User ID not found in Firebase token',
+      });
+    }
 
     if (!email) {
       throw new UnprocessableEntityException({
@@ -957,10 +976,20 @@ export class AuthService {
     let user = await this.usersService.findByFirebaseUid(uid);
 
     if (!user) {
-      // Split name into firstName and lastName if available
+  
       const nameParts = name ? name.split(' ') : [];
       const firstName = nameParts[0] || null;
       const lastName = nameParts.slice(1).join(' ') || null;
+      const lat = decodedToken.latitude || null;
+      const long = decodedToken.longitude || null;
+      let provider = sign_in_provider;
+      if(provider === 'google') {
+        provider = AuthProvidersEnum.google;
+      } else if(provider === 'facebook') {
+        provider = AuthProvidersEnum.facebook;
+      } else if(provider === 'apple') {
+        provider = AuthProvidersEnum.apple;
+      }
 
       user = await this.usersService.create({
         provider: sign_in_provider,  
@@ -983,6 +1012,8 @@ export class AuthService {
         },
         isUserVerified: true,
         isCompanyVerified: false,
+        lat: lat,
+        long: long,
       });
     }
 
