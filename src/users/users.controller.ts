@@ -92,12 +92,6 @@ export class UsersController {
     description: 'Filter by currency',
   })
   @ApiQuery({
-    name: 'company',
-    required: false,
-    type: String,
-    description: 'Filter by company',
-  })
-  @ApiQuery({
     name: 'page',
     required: false,
     type: Number,

@@ -2,10 +2,6 @@ export declare class AuthRegisterLoginDto {
     email: string;
     firstName: string;
     lastName: string;
-    fullName: string;
-    company: string;
-    jobTitle: string;
-    emailAddress: string;
     phoneNumber: number;
     countryCode: string;
     isoCode: string;

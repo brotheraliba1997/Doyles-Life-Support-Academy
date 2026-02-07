@@ -1,7 +1,7 @@
 export declare class OtpVerifyUserResponseDto {
     id: number | string;
     isUserVerified: boolean;
-    isCompanyVerified: boolean;
+    isCompletedProfileVerified: boolean;
 }
 export declare class OtpVerifyResponseDataDto {
     token: string;

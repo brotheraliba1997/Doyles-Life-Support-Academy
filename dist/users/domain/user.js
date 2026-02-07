@@ -75,13 +75,6 @@ __decorate([
 ], User.prototype, "lastName", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
-        type: String,
-        example: 'John Doe',
-    }),
-    __metadata("design:type", String)
-], User.prototype, "fullName", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({
         type: () => file_1.FileType,
     }),
     __metadata("design:type", file_1.FileType)
@@ -98,18 +91,6 @@ __decorate([
     }),
     __metadata("design:type", status_1.Status)
 ], User.prototype, "status", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)(),
-    __metadata("design:type", String)
-], User.prototype, "company", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)(),
-    __metadata("design:type", String)
-], User.prototype, "jobTitle", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)(),
-    __metadata("design:type", String)
-], User.prototype, "emailAddress", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)(),
     __metadata("design:type", Number)
@@ -213,5 +194,5 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiProperty)(),
     __metadata("design:type", Boolean)
-], User.prototype, "isCompanyVerified", void 0);
+], User.prototype, "isCompletedProfileVerified", void 0);
 //# sourceMappingURL=user.js.map

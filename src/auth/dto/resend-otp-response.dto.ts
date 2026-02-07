@@ -10,7 +10,7 @@ export class ResendOtpUserResponseDto {
   isUserVerified: boolean;
 
   @ApiProperty({ example: true, description: 'Company verified status' })
-  isCompanyVerified: boolean;
+  isCompletedProfileVerified: boolean;
 }
 
 export class ResendOtpResponseDataDto {

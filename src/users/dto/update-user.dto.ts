@@ -51,8 +51,8 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   @IsBoolean()
   isUserVerified?: boolean;
 
-  @ApiPropertyOptional({ example: true, description: 'Is company verified', type: Boolean })
+  @ApiPropertyOptional({ example: true, description: 'Is completed profile verified', type: Boolean })
   @IsOptional()
   @IsBoolean()
-  isCompanyVerified?: boolean;
+  isCompletedProfileVerified?: boolean;
 }

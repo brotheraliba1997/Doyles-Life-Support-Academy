@@ -93,7 +93,7 @@ let AuthService = class AuthService {
         const userWithFlags = {
             ...user,
             isUserVerified: userOtp ? false : user.isUserVerified,
-            isCompanyVerified: user.isCompanyVerified || false,
+            isCompletedProfileVerified: user.isCompletedProfileVerified || false,
         };
         return {
             success: true,
@@ -143,9 +143,6 @@ let AuthService = class AuthService {
                 provider: authProvider,
                 role,
                 status,
-                company: null,
-                jobTitle: null,
-                emailAddress: null,
                 phoneNumber: null,
                 country: null,
                 industry: null,
@@ -200,9 +197,6 @@ let AuthService = class AuthService {
             password: dto.password,
             firstName: null,
             lastName: null,
-            company: '',
-            jobTitle: '',
-            emailAddress: dto.email,
             phoneNumber: 0,
             country: '',
             industry: '',
@@ -213,7 +207,7 @@ let AuthService = class AuthService {
                 id: statuses_enum_1.StatusEnum.inactive,
             },
             isUserVerified: false,
-            isCompanyVerified: false,
+            isCompletedProfileVerified: false,
         });
         await this.userOtpModel.create({
             userId: new mongoose_2.Types.ObjectId(user.id),
@@ -227,7 +221,7 @@ let AuthService = class AuthService {
             success: true,
             data: {
                 isUserVerified: user.isUserVerified,
-                isCompleteProfile: user.isCompanyVerified,
+                isCompletedProfileVerified: user.isCompletedProfileVerified,
                 id: user.id,
                 email: user.email || dto.email,
             },
@@ -283,7 +277,7 @@ let AuthService = class AuthService {
             id: updatedUser.id,
             email: updatedUser.email,
             isUserVerified: updatedUser.isUserVerified,
-            isCompanyVerified: updatedUser.isCompanyVerified || false,
+            isCompletedProfileVerified: updatedUser.isCompletedProfileVerified || false,
         };
         const hash = crypto_1.default
             .createHash('sha256')
@@ -346,7 +340,7 @@ let AuthService = class AuthService {
         const userResponse = {
             id: user.id,
             isUserVerified: user.isUserVerified || false,
-            isCompanyVerified: user.isCompanyVerified || false,
+            isCompletedProfileVerified: user.isCompletedProfileVerified || false,
         };
         return {
             success: true,
@@ -371,10 +365,6 @@ let AuthService = class AuthService {
             password: existingUser.password,
             firstName: dto.firstName,
             lastName: dto.lastName,
-            fullName: dto.fullName,
-            company: dto.company ?? null,
-            jobTitle: dto.jobTitle ?? null,
-            emailAddress: dto.emailAddress ?? dto.email,
             phoneNumber: dto.phoneNumber ?? null,
             country: dto.country ?? null,
             industry: dto.industry ?? null,
@@ -394,7 +384,7 @@ let AuthService = class AuthService {
             deviceType: dto.deviceType,
             role: dto.role ? { id: dto.role } : undefined,
             isUserVerified: true,
-            isCompanyVerified: true,
+            isCompletedProfileVerified: true,
         });
         if (!updatedUser) {
             throw new common_1.UnprocessableEntityException({
@@ -765,10 +755,6 @@ let AuthService = class AuthService {
                 email: email,
                 firstName: firstName,
                 lastName: lastName,
-                fullName: name || null,
-                company: '',
-                jobTitle: '',
-                emailAddress: email,
                 phoneNumber: 0,
                 country: '',
                 industry: '',
@@ -779,7 +765,7 @@ let AuthService = class AuthService {
                     id: statuses_enum_1.StatusEnum.inactive,
                 },
                 isUserVerified: true,
-                isCompanyVerified: false,
+                isCompletedProfileVerified: false,
                 lat: lat,
                 long: long,
             });
@@ -802,13 +788,10 @@ let AuthService = class AuthService {
             success: true,
             message: 'Login successful',
             data: {
-                id: user.id,
-                email: user.email,
+                user: user,
                 token,
                 refreshToken,
                 tokenExpires,
-                isUserVerified: user.isUserVerified,
-                isCompanyVerified: user.isCompanyVerified || false,
             },
         };
     }

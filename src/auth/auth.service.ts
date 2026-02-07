@@ -125,7 +125,7 @@ export class AuthService {
     const userWithFlags = {
       ...user,
       isUserVerified: userOtp ? false : user.isUserVerified,
-      isCompanyVerified: (user as any).isCompanyVerified || false,
+      isCompletedProfileVerified: (user as any).isCompletedProfileVerified || false,
     };
 
     return {
@@ -181,9 +181,6 @@ export class AuthService {
         provider: authProvider,
         role,
         status,
-        company: null,
-        jobTitle: null,
-        emailAddress: null,
         phoneNumber: null,
         country: null,
         industry: null,
@@ -253,9 +250,6 @@ export class AuthService {
       password: dto.password,
       firstName: null,
       lastName: null,
-      company: '',
-      jobTitle: '', 
-      emailAddress: dto.email, 
       phoneNumber: 0, 
       country: '', 
       industry: '', 
@@ -266,7 +260,7 @@ export class AuthService {
         id: StatusEnum.inactive,
       },
       isUserVerified: false,
-      isCompanyVerified: false,
+      isCompletedProfileVerified: false,
     });
     
     await this.userOtpModel.create({
@@ -282,7 +276,7 @@ export class AuthService {
       success: true,
       data: {
         isUserVerified: user.isUserVerified,
-        isCompleteProfile: user.isCompanyVerified,
+        isCompletedProfileVerified: user.isCompletedProfileVerified,
          id: user.id,
       email: user.email || dto.email, 
       },
@@ -361,7 +355,7 @@ export class AuthService {
       id: updatedUser.id,
       email: updatedUser.email,
       isUserVerified: updatedUser.isUserVerified,
-      isCompanyVerified: (updatedUser as any).isCompanyVerified || false,
+      isCompletedProfileVerified: (updatedUser as any).isCompletedProfileVerified || false,
     }
 
     const hash = crypto
@@ -444,7 +438,7 @@ export class AuthService {
     const userResponse = {
       id: user.id,
       isUserVerified: user.isUserVerified || false,
-      isCompanyVerified: (user as any).isCompanyVerified || false,
+      isCompletedProfileVerified: (user as any).isCompletedProfileVerified || false,
     };
 
     return {
@@ -480,10 +474,6 @@ export class AuthService {
       password: existingUser.password,
       firstName: dto.firstName ,
       lastName:  dto.lastName,  
-      fullName:  dto.fullName,
-      company: dto.company ?? null,
-      jobTitle: dto.jobTitle ?? null,
-      emailAddress: dto.emailAddress ?? dto.email,
       phoneNumber: dto.phoneNumber ?? null,
       country: dto.country ?? null,
       industry: dto.industry ?? null,
@@ -503,7 +493,7 @@ export class AuthService {
       deviceType: dto.deviceType,
       role: dto.role ? { id: dto.role } : undefined,
       isUserVerified: true,
-      isCompanyVerified: true,
+      isCompletedProfileVerified: true,
      
     });
 
@@ -991,10 +981,6 @@ export class AuthService {
         email: email,
         firstName: firstName,
         lastName: lastName,
-        fullName: name || null,
-        company: '',
-        jobTitle: '',
-        emailAddress: email,
         phoneNumber: 0,
         country: '',
         industry: '',
@@ -1005,7 +991,7 @@ export class AuthService {
           id: StatusEnum.inactive,
         },
         isUserVerified: true,
-        isCompanyVerified: false,
+        isCompletedProfileVerified: false,
         lat: lat,
         long: long,
       });
@@ -1033,13 +1019,11 @@ export class AuthService {
       success: true,
       message: 'Login successful',
       data: {
-        id: user.id,
-        email: user.email,
+       user: user,
         token,
         refreshToken,
         tokenExpires,
-        isUserVerified: user.isUserVerified,
-        isCompanyVerified: (user as any).isCompanyVerified || false,
+        
       },
     };
   }

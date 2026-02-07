@@ -39,13 +39,10 @@ export declare class AuthController {
         success: boolean;
         message: string;
         data: {
-            id: any;
-            email: any;
+            user: any;
             token: string;
             refreshToken: string;
             tokenExpires: number;
-            isUserVerified: any;
-            isCompanyVerified: any;
         };
     }>;
     refresh(request: any): Promise<RefreshResponseDto>;

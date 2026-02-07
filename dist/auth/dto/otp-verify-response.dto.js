@@ -27,7 +27,7 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiProperty)({ example: true, description: 'Company verified status' }),
     __metadata("design:type", Boolean)
-], OtpVerifyUserResponseDto.prototype, "isCompanyVerified", void 0);
+], OtpVerifyUserResponseDto.prototype, "isCompletedProfileVerified", void 0);
 class OtpVerifyResponseDataDto {
 }
 exports.OtpVerifyResponseDataDto = OtpVerifyResponseDataDto;

@@ -12,13 +12,9 @@ export declare class UserSchemaClass extends EntityDocumentHelper {
     socialId?: string | null;
     firstName: string | null;
     lastName: string | null;
-    fullName?: string | null;
     photo?: FileSchemaClass | null;
     role?: RoleSchema | null;
     status?: StatusSchema;
-    company?: string;
-    jobTitle?: string;
-    emailAddress?: string;
     phoneNumber?: number;
     countryCode?: string;
     isoCode?: string;
@@ -43,7 +39,7 @@ export declare class UserSchemaClass extends EntityDocumentHelper {
     isDeleted: boolean;
     isActive: boolean;
     isUserVerified: boolean;
-    isCompanyVerified: boolean;
+    isCompletedProfileVerified: boolean;
 }
 export declare const UserSchema: import("mongoose").Schema<UserSchemaClass, import("mongoose").Model<UserSchemaClass, any, any, any, import("mongoose").Document<unknown, any, UserSchemaClass, any, {}> & UserSchemaClass & Required<{
     _id: string;

@@ -8,13 +8,9 @@ export declare class CreateUserDto {
     socialId?: string | null;
     firstName: string | null;
     lastName: string | null;
-    fullName?: string | null;
     photo?: FileDto | null;
     role?: RoleDto | null;
     status?: StatusDto | null;
-    company: string;
-    jobTitle: string;
-    emailAddress: string;
     phoneNumber: number;
     countryCode?: string;
     isoCode?: string;
@@ -34,5 +30,5 @@ export declare class CreateUserDto {
     deviceToken?: string;
     deviceType?: string;
     isUserVerified?: boolean;
-    isCompanyVerified?: boolean;
+    isCompletedProfileVerified?: boolean;
 }

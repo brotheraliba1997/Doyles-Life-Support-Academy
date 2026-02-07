@@ -37,9 +37,6 @@ export class UserSchemaClass extends EntityDocumentHelper {
   @Prop({ type: String })
   lastName: string | null;
 
-  @Prop({ type: String })
-  fullName?: string | null;
-
   @Prop({ type: FileSchemaClass })
   photo?: FileSchemaClass | null;
 
@@ -48,17 +45,6 @@ export class UserSchemaClass extends EntityDocumentHelper {
 
   @Prop({ type: StatusSchema })
   status?: StatusSchema;
-
-  // ✅ Renamed from DTO field `companyName`
-  @Prop()
-  company?: string;
-
-  // ✅ Newly added fields (missing before)s
-  @Prop()
-  jobTitle?: string;
-
-  @Prop()
-  emailAddress?: string;
 
   @Prop()
   phoneNumber?: number;
@@ -134,7 +120,7 @@ export class UserSchemaClass extends EntityDocumentHelper {
 
 
   @Prop({ default: false })
-  isCompanyVerified: boolean;
+  isCompletedProfileVerified: boolean;
 }
 
 export const UserSchema = SchemaFactory.createForClass(UserSchemaClass);

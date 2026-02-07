@@ -23,7 +23,7 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiProperty)({ example: false, description: 'Profile completion status' }),
     __metadata("design:type", Boolean)
-], RegisterStep1ResponseDataDto.prototype, "isCompleteProfile", void 0);
+], RegisterStep1ResponseDataDto.prototype, "isCompletedProfileVerified", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ example: '507f1f77bcf86cd799439011' }),
     __metadata("design:type", Object)

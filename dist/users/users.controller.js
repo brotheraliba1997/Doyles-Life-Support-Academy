@@ -101,12 +101,6 @@ __decorate([
         description: 'Filter by currency',
     }),
     (0, swagger_1.ApiQuery)({
-        name: 'company',
-        required: false,
-        type: String,
-        description: 'Filter by company',
-    }),
-    (0, swagger_1.ApiQuery)({
         name: 'page',
         required: false,
         type: Number,

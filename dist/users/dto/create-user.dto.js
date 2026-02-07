@@ -58,12 +58,6 @@ __decorate([
     __metadata("design:type", String)
 ], CreateUserDto.prototype, "lastName", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ example: 'John Doe', type: String }),
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], CreateUserDto.prototype, "fullName", void 0);
-__decorate([
     (0, swagger_1.ApiPropertyOptional)({ type: () => file_dto_1.FileDto }),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", file_dto_1.FileDto)
@@ -80,24 +74,6 @@ __decorate([
     (0, class_transformer_1.Type)(() => status_dto_1.StatusDto),
     __metadata("design:type", status_dto_1.StatusDto)
 ], CreateUserDto.prototype, "status", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ example: 'Orca Technologies', type: String }),
-    (0, class_validator_1.IsNotEmpty)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], CreateUserDto.prototype, "company", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ example: 'Web Developer', type: String }),
-    (0, class_validator_1.IsNotEmpty)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], CreateUserDto.prototype, "jobTitle", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ example: 'hamzaali1997.h@gmail.com', type: String }),
-    (0, class_validator_1.IsNotEmpty)(),
-    (0, class_validator_1.IsEmail)(),
-    __metadata("design:type", String)
-], CreateUserDto.prototype, "emailAddress", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ example: '923001234567', type: Number }),
     (0, class_validator_1.IsNotEmpty)(),
@@ -212,9 +188,9 @@ __decorate([
     __metadata("design:type", Boolean)
 ], CreateUserDto.prototype, "isUserVerified", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ example: true, description: 'Is company verified', type: Boolean }),
+    (0, swagger_1.ApiPropertyOptional)({ example: true, description: 'Is completed profile verified', type: Boolean }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsBoolean)(),
     __metadata("design:type", Boolean)
-], CreateUserDto.prototype, "isCompanyVerified", void 0);
+], CreateUserDto.prototype, "isCompletedProfileVerified", void 0);
 //# sourceMappingURL=create-user.dto.js.map

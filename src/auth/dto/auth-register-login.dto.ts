@@ -19,23 +19,6 @@ export class AuthRegisterLoginDto {
   @IsNotEmpty()
   lastName: string;
 
-  @ApiProperty({ example: 'John Doe' })
-  @IsNotEmpty()
-  @IsString()
-  fullName: string;
-
-  @ApiProperty({ example: 'orca-technologies' })
-  @IsNotEmpty()
-  company: string;
-
-  @ApiProperty({ example: 'web developer' })
-  @IsNotEmpty()
-  jobTitle: string;
-
-  @ApiProperty({ example: 'hamzaali1997.h@gmail.com' })
-  @IsNotEmpty()
-  emailAddress: string;
-
   @ApiProperty({ example: '923001234567', type: Number })
   @IsNotEmpty()
   @IsNumber()

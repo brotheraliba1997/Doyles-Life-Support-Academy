@@ -49,10 +49,6 @@ __decorate([
     __metadata("design:type", String)
 ], UserSchemaClass.prototype, "lastName", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: String }),
-    __metadata("design:type", String)
-], UserSchemaClass.prototype, "fullName", void 0);
-__decorate([
     (0, mongoose_1.Prop)({ type: file_schema_1.FileSchemaClass }),
     __metadata("design:type", file_schema_1.FileSchemaClass)
 ], UserSchemaClass.prototype, "photo", void 0);
@@ -64,18 +60,6 @@ __decorate([
     (0, mongoose_1.Prop)({ type: status_schema_1.StatusSchema }),
     __metadata("design:type", status_schema_1.StatusSchema)
 ], UserSchemaClass.prototype, "status", void 0);
-__decorate([
-    (0, mongoose_1.Prop)(),
-    __metadata("design:type", String)
-], UserSchemaClass.prototype, "company", void 0);
-__decorate([
-    (0, mongoose_1.Prop)(),
-    __metadata("design:type", String)
-], UserSchemaClass.prototype, "jobTitle", void 0);
-__decorate([
-    (0, mongoose_1.Prop)(),
-    __metadata("design:type", String)
-], UserSchemaClass.prototype, "emailAddress", void 0);
 __decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", Number)
@@ -175,7 +159,7 @@ __decorate([
 __decorate([
     (0, mongoose_1.Prop)({ default: false }),
     __metadata("design:type", Boolean)
-], UserSchemaClass.prototype, "isCompanyVerified", void 0);
+], UserSchemaClass.prototype, "isCompletedProfileVerified", void 0);
 exports.UserSchemaClass = UserSchemaClass = __decorate([
     (0, mongoose_1.Schema)({
         timestamps: true,

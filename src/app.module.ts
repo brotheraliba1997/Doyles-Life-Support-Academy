@@ -11,6 +11,7 @@ import facebookConfig from './auth-facebook/config/facebook.config';
 import googleConfig from './auth-google/config/google.config';
 import appleConfig from './auth-apple/config/apple.config';
 import path from 'path';
+import { existsSync } from 'fs';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthAppleModule } from './auth-apple/auth-apple.module';
@@ -79,12 +80,17 @@ const infrastructureDatabaseModule = (databaseConfig() as DatabaseConfig)
     }),
     infrastructureDatabaseModule,
     I18nModule.forRootAsync({
-      useFactory: (configService: ConfigService<AllConfigType>) => ({
-        fallbackLanguage: configService.getOrThrow('app.fallbackLanguage', {
-          infer: true,
-        }),
-        loaderOptions: { path: path.join(__dirname, '/i18n/'), watch: true },
-      }),
+      useFactory: (configService: ConfigService<AllConfigType>) => {
+        const distI18n = path.join(__dirname, 'i18n');
+        const srcI18n = path.join(process.cwd(), 'src', 'i18n');
+        const i18nPath = existsSync(distI18n) ? distI18n : srcI18n;
+        return {
+          fallbackLanguage: configService.getOrThrow('app.fallbackLanguage', {
+            infer: true,
+          }),
+          loaderOptions: { path: i18nPath + path.sep, watch: true },
+        };
+      },
       resolvers: [
         {
           use: HeaderResolver,

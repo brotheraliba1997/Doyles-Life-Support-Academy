@@ -47,11 +47,6 @@ export class CreateUserDto {
   @IsString()
   lastName: string | null;
 
-  @ApiPropertyOptional({ example: 'John Doe', type: String })
-  @IsOptional()
-  @IsString()
-  fullName?: string | null;
-
   @ApiPropertyOptional({ type: () => FileDto })
   @IsOptional()
   photo?: FileDto | null;
@@ -65,23 +60,6 @@ export class CreateUserDto {
   @IsOptional()
   @Type(() => StatusDto)
   status?: StatusDto | null;
-
-  // ✅ Additional fields from your schema
-
-  @ApiProperty({ example: 'Orca Technologies', type: String })
-  @IsNotEmpty()
-  @IsString()
-  company: string;
-
-  @ApiProperty({ example: 'Web Developer', type: String })
-  @IsNotEmpty()
-  @IsString()
-  jobTitle: string;
-
-  @ApiProperty({ example: 'hamzaali1997.h@gmail.com', type: String })
-  @IsNotEmpty()
-  @IsEmail()
-  emailAddress: string;
 
   @ApiProperty({ example: '923001234567', type: Number })
   @IsNotEmpty()
@@ -177,8 +155,8 @@ export class CreateUserDto {
   @IsBoolean()
   isUserVerified?: boolean;
 
-  @ApiPropertyOptional({ example: true, description: 'Is company verified', type: Boolean })
+  @ApiPropertyOptional({ example: true, description: 'Is completed profile verified', type: Boolean })
   @IsOptional()
   @IsBoolean()
-  isCompanyVerified?: boolean;
+  isCompletedProfileVerified?: boolean;
 }

@@ -9,13 +9,9 @@ export declare class User {
     socialId?: string | null;
     firstName: string | null;
     lastName: string | null;
-    fullName?: string | null;
     photo?: FileType | null;
     role?: Role | null;
     status?: Status;
-    company?: string;
-    jobTitle?: string;
-    emailAddress?: string;
     phoneNumber?: number;
     countryCode?: string;
     isoCode?: string;
@@ -41,5 +37,5 @@ export declare class User {
     isActive: boolean;
     isEmailVerified?: boolean;
     isUserVerified?: boolean;
-    isCompanyVerified?: boolean;
+    isCompletedProfileVerified?: boolean;
 }

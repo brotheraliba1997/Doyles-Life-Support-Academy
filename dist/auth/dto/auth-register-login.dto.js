@@ -34,27 +34,6 @@ __decorate([
     __metadata("design:type", String)
 ], AuthRegisterLoginDto.prototype, "lastName", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'John Doe' }),
-    (0, class_validator_1.IsNotEmpty)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], AuthRegisterLoginDto.prototype, "fullName", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ example: 'orca-technologies' }),
-    (0, class_validator_1.IsNotEmpty)(),
-    __metadata("design:type", String)
-], AuthRegisterLoginDto.prototype, "company", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ example: 'web developer' }),
-    (0, class_validator_1.IsNotEmpty)(),
-    __metadata("design:type", String)
-], AuthRegisterLoginDto.prototype, "jobTitle", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ example: 'hamzaali1997.h@gmail.com' }),
-    (0, class_validator_1.IsNotEmpty)(),
-    __metadata("design:type", String)
-], AuthRegisterLoginDto.prototype, "emailAddress", void 0);
-__decorate([
     (0, swagger_1.ApiProperty)({ example: '923001234567', type: Number }),
     (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.IsNumber)(),

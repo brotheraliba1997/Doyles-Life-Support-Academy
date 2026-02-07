@@ -55,12 +55,6 @@ export class User {
   lastName: string | null;
 
   @ApiProperty({
-    type: String,
-    example: 'John Doe',
-  })
-  fullName?: string | null;
-
-  @ApiProperty({
     type: () => FileType,
   })
   photo?: FileType | null;
@@ -74,15 +68,6 @@ export class User {
     type: () => Status,
   })
   status?: Status;
-
-  @ApiProperty()
-  company?: string;
-
-  @ApiProperty()
-  jobTitle?: string;
-
-  @ApiProperty()
-  emailAddress?: string;
 
   @ApiProperty()
   phoneNumber?: number;
@@ -160,5 +145,5 @@ export class User {
   isUserVerified?: boolean;
 
   @ApiProperty()
-  isCompanyVerified?: boolean;
+  isCompletedProfileVerified?: boolean;
 }

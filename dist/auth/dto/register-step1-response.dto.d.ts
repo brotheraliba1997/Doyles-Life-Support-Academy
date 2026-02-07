@@ -1,6 +1,6 @@
 export declare class RegisterStep1ResponseDataDto {
     isUserVerified: boolean;
-    isCompleteProfile: boolean;
+    isCompletedProfileVerified: boolean;
     id: string | number;
     email: string;
 }

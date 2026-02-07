@@ -10,7 +10,7 @@ export class RegisterStep1ResponseDataDto {
 
   @ApiProperty({ example: false, description: 'Profile completion status' })
   
-  isCompleteProfile: boolean;
+  isCompletedProfileVerified: boolean;
 
 
   @ApiProperty({ example: '507f1f77bcf86cd799439011' })

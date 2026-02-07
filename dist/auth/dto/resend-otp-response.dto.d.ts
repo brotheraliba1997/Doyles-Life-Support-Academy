@@ -1,7 +1,7 @@
 export declare class ResendOtpUserResponseDto {
     id: number | string;
     isUserVerified: boolean;
-    isCompanyVerified: boolean;
+    isCompletedProfileVerified: boolean;
 }
 export declare class ResendOtpResponseDataDto {
     otp: string;

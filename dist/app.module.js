@@ -23,6 +23,7 @@ const facebook_config_1 = __importDefault(require("./auth-facebook/config/facebo
 const google_config_1 = __importDefault(require("./auth-google/config/google.config"));
 const apple_config_1 = __importDefault(require("./auth-apple/config/apple.config"));
 const path_1 = __importDefault(require("path"));
+const fs_1 = require("fs");
 const config_1 = require("@nestjs/config");
 const typeorm_1 = require("@nestjs/typeorm");
 const auth_apple_module_1 = require("./auth-apple/auth-apple.module");
@@ -78,12 +79,17 @@ exports.AppModule = AppModule = __decorate([
             }),
             infrastructureDatabaseModule,
             nestjs_i18n_1.I18nModule.forRootAsync({
-                useFactory: (configService) => ({
-                    fallbackLanguage: configService.getOrThrow('app.fallbackLanguage', {
-                        infer: true,
-                    }),
-                    loaderOptions: { path: path_1.default.join(__dirname, '/i18n/'), watch: true },
-                }),
+                useFactory: (configService) => {
+                    const distI18n = path_1.default.join(__dirname, 'i18n');
+                    const srcI18n = path_1.default.join(process.cwd(), 'src', 'i18n');
+                    const i18nPath = (0, fs_1.existsSync)(distI18n) ? distI18n : srcI18n;
+                    return {
+                        fallbackLanguage: configService.getOrThrow('app.fallbackLanguage', {
+                            infer: true,
+                        }),
+                        loaderOptions: { path: i18nPath + path_1.default.sep, watch: true },
+                    };
+                },
                 resolvers: [
                     {
                         use: nestjs_i18n_1.HeaderResolver,

@@ -50,13 +50,10 @@ export declare class AuthService {
         success: boolean;
         message: string;
         data: {
-            id: any;
-            email: any;
+            user: any;
             token: string;
             refreshToken: string;
             tokenExpires: number;
-            isUserVerified: any;
-            isCompanyVerified: any;
         };
     }>;
     me(userJwtPayload: JwtPayloadType): Promise<NullableType<User>>;
